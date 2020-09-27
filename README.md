@@ -1,2 +1,2 @@
 # bdp
-Graph Bipartite Graph Drawing Problem Python Implementation
+GRASP Bipartite Drawing Problem Python Implementation
