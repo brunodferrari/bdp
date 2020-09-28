@@ -32,7 +32,9 @@ B.add_nodes_from(["a", "b", "c"], bipartite=2)
 B.add_edges_from([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
 
 
-#def pi(setlist)
+def pi(setlist, i):
+    return int(np.where(setlist == i))
+    
 
 
 def plotBGraph(G):
