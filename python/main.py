@@ -48,7 +48,7 @@ def plotBGraph(G):
     nx.draw_networkx_labels(G, pos)
 
 
-class Graph:
+class BGraph:
     
     #def __init__(self):
      #   self.set_v1 = []
@@ -70,7 +70,31 @@ class Graph:
             self.set_v2 = []
             self.set_v2 = setlist
         return self.set_v2
+    
+    def perm_v1(self, pos = None):
+        if pos != None:
+            return np.vectorize(lambda i: pi(self.v1(), i))(pos)
+        else:
+            return np.vectorize(lambda i: pi(self.v1(), i))(self.v1())
+    
+    def perm_v2(self, pos = None):
+        if pos != None:
+            return np.vectorize(lambda i: pi(self.v2(), i))(pos)
+        else:
+            return np.vectorize(lambda i: pi(self.v1(), i))(self.v2())
+    
+    def add_v1(self, i, pos):
+        if pos != -1: 
+            self.set_v1 = C.v1()[:pos] + [i] + C.v1()[pos:]
+        else:
+            self.set_v1 = C.v1()[:] + [i]
         
+    def add_v2(self, i, pos):
+        if pos != -1: 
+            self.set_v2 = C.v2()[:pos] + [i] + C.v1()[pos:]
+        else:
+            self.set_v2 = C.v2()[:] + [i]
+    
     def n_v1(self):
         #self.n_v1 = len(self.v1)
         return len(self.set_v1)
@@ -85,5 +109,5 @@ class Graph:
     def adj_v1(self, G):
         self.adj_v1 = G
 
-C = Graph()
+C = BGraph()
 C.v1([10,3,4,5,61, 20])
