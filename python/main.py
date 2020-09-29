@@ -47,11 +47,10 @@ def plotBGraph(G):
     B.add_nodes_from(G.v2(), bipartite=2)
     B.add_edges_from(G.edges())
     
-    top = list(nx.bipartite.sets(B)[0])[::-1]
-    #top = nx.bipartite.sets(G)[0]
+    top = G.v1()
     pos = nx.bipartite_layout(B, top)    
     nx.draw(B, pos)
-    nx.draw_networkx_labels(B,pos)
+    nx.draw_networkx_labels(B, pos)
 
 
 
