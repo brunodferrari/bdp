@@ -18,22 +18,6 @@ pos = nx.bipartite_layout(G, top)
 nx.draw(G, pos)
 nx.draw_networkx_labels(G, pos)
 
-
-
-B = nx.Graph()
-
-# Add nodes with the node attribute "bipartite"
-
-B.add_nodes_from([5, 3, 2, 4], bipartite=1)
-B.add_nodes_from(["a", "b", "c"], bipartite=2)
-
-# Add edges only between nodes of opposite node sets
-
-B.add_edges_from([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
-
-
-
-
 def pi(setlist, i):
     try:
         return np.int(np.where(np.array(setlist) == i )[0])
@@ -47,11 +31,53 @@ def plotBGraph(G):
     B.add_nodes_from(G.v2(), bipartite=2)
     B.add_edges_from(G.edges())
     
-    top = G.v1()
-    pos = nx.bipartite_layout(B, top)    
+    pos = bdp_lyt(G)    
     nx.draw(B, pos)
     nx.draw_networkx_labels(B, pos)
 
+def bdp_lyt(G):
+    
+    import numpy as np
+    #G, center = _process_params(G, center=center, dim=2)
+    #if len(G) == 0:
+     #   return {}
+     
+    #center = np.zeros(2)
+
+    top = G.v1()[::-1]
+    bottom = G.v2()[::-1]
+
+    height = 1
+    width = (4/3) * height
+    offset = (width/2, height/2)
+
+    nodes = top + bottom
+
+    left_xs = np.repeat(0, len(top))
+    right_xs = np.repeat(width, len(bottom))
+    left_ys = np.linspace(0, height, len(top))
+    right_ys = np.linspace(0, height, len(bottom))
+    
+    top_pos = np.column_stack([left_xs, left_ys]) - offset
+    bottom_pos = np.column_stack([right_xs, right_ys]) - offset
+    
+    pos = np.concatenate([top_pos, bottom_pos])
+    #pos = rescale_layout(pos, scale=scale) + center
+    pos = dict(zip(nodes, pos))
+    return pos
+
+def bary(G, v, v_layer = None):
+    
+    if v_layer == None:
+        return
+    elif v_layer == 1:
+        pi_k = G.v2()
+        K = [x for x in pi_k if (v, x) in G.edges()]
+    elif v_layer == 2:
+        pi_k = G.v1()
+        K = [x for x in pi_k if (x, v) in G.edges()]
+    
+    len(K)
 
 
 class BGraph:
@@ -81,15 +107,15 @@ class BGraph:
     
     def perm_v1(self, pos = None):
         if pos != None:
-            return np.vectorize(lambda i: pi(self.v1(), i))(pos)
+            return np.vectorize(lambda i: pi(self.v1(), i))(pos) + 1
         else:
-            return np.vectorize(lambda i: pi(self.v1(), i))(self.v1())
+            return np.vectorize(lambda i: pi(self.v1(), i))(self.v1()) + 1
     
     def perm_v2(self, pos = None):
         if pos != None:
-            return np.vectorize(lambda i: pi(self.v2(), i))(pos)
+            return np.vectorize(lambda i: pi(self.v2(), i))(pos) + 1
         else:
-            return np.vectorize(lambda i: pi(self.v2(), i))(self.v2())
+            return np.vectorize(lambda i: pi(self.v2(), i))(self.v2()) + 1
     
     def add_v1(self, i, pos):
         if pos != -1: 
@@ -122,3 +148,16 @@ B.v1([5,3,2,4])
 B.v2(['a','b','c'])
 B.edges([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
 plotBGraph(B)
+
+
+
+C = nx.Graph()
+
+# Add nodes with the node attribute "bipartite"
+
+C.add_nodes_from(B.v1(), bipartite=1)
+C.add_nodes_from(B.v2(), bipartite=2)
+
+# Add edges only between nodes of opposite node sets
+
+C.add_edges_from([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
