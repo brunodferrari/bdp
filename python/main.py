@@ -69,9 +69,9 @@ def bdp_lyt(G):
 def bary_sort(barylist, nodelist):
     
     aux = [(pos, v) for (pos, v) in zip(barylist, nodelist)]
-    aux.sort(key=lambda tup: tup[0], reverse=True)
+    aux.sort(key=lambda tup: tup[0])
     
-    return aux
+    return list(np.int0(np.array(aux)[:,1]))
 
 
 
