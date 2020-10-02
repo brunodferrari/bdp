@@ -66,6 +66,15 @@ def bdp_lyt(G):
     pos = dict(zip(nodes, pos))
     return pos
 
+def bary_sort(barylist, nodelist):
+    
+    aux = [(pos, v) for (pos, v) in zip(barylist, nodelist)]
+    aux.sort(key=lambda tup: tup[0], reverse=True)
+    
+    return aux
+
+
+
 def bary(G, v, v_layer = None):
     
     if v_layer == None:
