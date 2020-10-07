@@ -6,7 +6,8 @@ Created on Sun Sep 27 19:59:50 2020
 """
 
 import numpy as np
-import matplotlib as plt
+import pandas as pd
+import matplotlib.pyplot as plt
 import networkx as nx
 
 
@@ -158,7 +159,26 @@ B.v2(['a','b','c'])
 B.edges([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
 plotBGraph(B)
 
+graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.3_0.2_1.txt")
 
+graph_edges = []
+for row in graph_data.iloc[1:26, 0]:
+    for adj in row.split(" ")[2:]:
+        graph_edges.append(( int(row.split(" ")[1]), int(adj)))
+
+New = BGraph()
+New.v2(np.unique(np.array(np.matrix(graph_edges)[:,1])).tolist())
+New.v1(np.unique(np.array(np.matrix(graph_edges)[:,0])).tolist())
+New.edges(graph_edges)
+plotBGraph(New)
+
+bary_sort(np.vectorize(bary)(New, New.v1(), 1), New.v1())
+
+New.v1(bary_sort(np.vectorize(bary)(New, New.v1(), 1), New.v1()))
+plotBGraph(New)
+
+New.v2(bary_sort(np.vectorize(bary)(New, New.v2(), 2), New.v2()))
+plotBGraph(New)
 
 C = nx.Graph()
 
