@@ -4,6 +4,7 @@ Created on Sun Sep 27 19:59:50 2020
 
 @author: Bruno Ferrari
 """
+#%config InlineBackend.figure_format = 'svg'
 
 import numpy as np
 import pandas as pd
@@ -35,6 +36,8 @@ def plotBGraph(G):
     pos = bdp_lyt(G)    
     nx.draw(B, pos)
     nx.draw_networkx_labels(B, pos)
+    #plt.savefig("test.pdf")    
+    #plt.show()
 
 def bdp_lyt(G):
     
@@ -48,7 +51,7 @@ def bdp_lyt(G):
     top = G.v1()[::-1]
     bottom = G.v2()[::-1]
 
-    height = 1
+    height = 100
     width = (4/3) * height
     offset = (width/2, height/2)
 
@@ -159,12 +162,18 @@ B.v2(['a','b','c'])
 B.edges([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
 plotBGraph(B)
 
-graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.3_0.2_1.txt")
+graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.3_0.2_2.txt")
 
 graph_edges = []
+graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
 for row in graph_data.iloc[1:26, 0]:
     for adj in row.split(" ")[2:]:
-        graph_edges.append(( int(row.split(" ")[1]), int(adj)))
+        if int(adj) not in graph_adj_nodes_incre: graph_edges.append(( int(row.split(" ")[1]), int(adj)))
+
+graph_edges2 = []
+for row in graph_data.iloc[1:32, 0]:
+    for adj in row.split(" ")[2:]:
+       graph_edges2.append(( int(row.split(" ")[1]), int(adj)))
 
 New = BGraph()
 New.v2(np.unique(np.array(np.matrix(graph_edges)[:,1])).tolist())
@@ -174,7 +183,12 @@ plotBGraph(New)
 
 bary_sort(np.vectorize(bary)(New, New.v1(), 1), New.v1())
 
+order_i = graph_data.iloc[32:-6, 0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
+    
 New.v1(bary_sort(np.vectorize(bary)(New, New.v1(), 1), New.v1()))
+plotBGraph(New)
+
+New.v1(order_i)
 plotBGraph(New)
 
 New.v2(bary_sort(np.vectorize(bary)(New, New.v2(), 2), New.v2()))
