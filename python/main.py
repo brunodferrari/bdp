@@ -162,7 +162,7 @@ B.v2(['a','b','c'])
 B.edges([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
 plotBGraph(B)
 
-graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.3_0.2_2.txt")
+graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.065_0.2_1.txt")
 
 graph_edges = []
 graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
@@ -195,6 +195,8 @@ New.v2(bary_sort(np.vectorize(bary)(New, New.v2(), 2), New.v2()))
 plotBGraph(New)
 
 C = nx.Graph()
+
+#D = |E| / (|V1| * |V2|)
 
 # Add nodes with the node attribute "bipartite"
 
