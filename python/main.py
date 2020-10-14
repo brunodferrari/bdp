@@ -23,6 +23,8 @@ nx.draw_networkx_labels(G, pos)
 def pi(setlist, i):
     try:
         return np.int(np.where(np.array(setlist) == i )[0])
+    except FutureWarning:
+        print(setlist, i)
     except TypeError:
         return -1    
 
@@ -92,6 +94,23 @@ def bary(G, v, v_layer = None):
         K = [x for x in pi_k if (x, v) in G.edges()] #encontra os viznho do vertice v na 1a camada
         return G.perm_v1(K).mean()
 
+def crossing(G):
+    aux = G.edges().copy()
+    c = 0
+    while len(aux) > 0:
+        e1 = aux.pop(0)
+        i = e1[0]
+        k = e1[1]
+        for e2 in aux:
+            j = e2[0]
+            l = e2[1]
+            
+            if pi(G.v1(), i) < pi(G.v1(), j) and pi(G.v2(), k) > pi(G.v2(), l):
+                c+=1
+            elif pi(G.v1(), i) > pi(G.v1(), j) and pi(G.v2(), k) < pi(G.v2(), l):
+                c+=1  
+    return c
+
 
 class BGraph:
     
@@ -153,6 +172,12 @@ class BGraph:
     def n_edge(self, n):
         self.n_edge = n
         
+    def density(self):
+        return len(self.set_edges) / (len(self.set_v1)*len(self.set_v2))
+        
+    def n_cross(self):
+        return crossing(self)
+        
     def adj_v1(self, G):
         self.adj_v1 = G
         
@@ -161,8 +186,9 @@ B.v1([5,3,2,4])
 B.v2(['a','b','c'])
 B.edges([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
 plotBGraph(B)
+B.n_cross()
 
-graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.065_0.2_1.txt")
+graph_data = pd.read_csv("./dbdp_instances/instances/incgraph_25_25_0.3_0.2_1.txt")
 
 graph_edges = []
 graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
@@ -206,3 +232,6 @@ C.add_nodes_from(B.v2(), bipartite=2)
 # Add edges only between nodes of opposite node sets
 
 C.add_edges_from([(5, "a"), (5, "b"), (2, "b"), (2, "c"), (3, "c"), (4, "a")])
+
+##cruzamentos
+
