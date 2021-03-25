@@ -6,6 +6,8 @@ Created on Sun Sep 27 19:59:50 2020
 """
 #%config InlineBackend.figure_format = 'svg'
 
+%cd C:\Users\Bruno Ferrari\Documents\Bruno\2019\2s\MC\artigos revisão\Artigos Mes\GD\bdp
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -194,7 +196,8 @@ graph_edges = []
 graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
 for row in graph_data.iloc[1:26, 0]:
     for adj in row.split(" ")[2:]:
-        if int(adj) not in graph_adj_nodes_incre: graph_edges.append(( int(row.split(" ")[1]), int(adj)))
+        if int(adj) not in graph_adj_nodes_incre: 
+            graph_edges.append(( int(row.split(" ")[1]), int(adj)))
 
 graph_edges2 = []
 for row in graph_data.iloc[1:32, 0]:
