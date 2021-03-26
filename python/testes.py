@@ -180,8 +180,7 @@ class BGraph:
     def n_cross(self):
         return crossing(self)
 
-    def adj_v1(self, G):
-        self.adj_v1 = G
+
         
         
 B = BGraph()

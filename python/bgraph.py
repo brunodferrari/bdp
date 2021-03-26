@@ -80,6 +80,26 @@ def plotBGraph(G):
     #plt.savefig("test.pdf")    
     #plt.show()
 
+def bary_sort(barylist, nodelist):
+    
+    aux = [(pos, v) for (pos, v) in zip(barylist, nodelist)]
+    aux.sort(key=lambda tup: tup[0])
+    
+    return list(np.int0(np.array(aux)[:,1]))
+
+#encontra baricentro do vertice
+def bary(G, v, v_layer = None):
+    
+    if v_layer == None:
+        return
+    elif v_layer == 1: 
+        pi_k = G.v2()
+        K = [x for x in pi_k if (v, x) in G.edges()] #encontra os viznho do vertice v na 2a camada
+        return G.perm_v2(K).mean()    
+    elif v_layer == 2:
+        pi_k = G.v1()
+        K = [x for x in pi_k if (x, v) in G.edges()] #encontra os viznho do vertice v na 1a camada
+        return G.perm_v1(K).mean()
 
 class BGraph:
     
