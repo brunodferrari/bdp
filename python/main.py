@@ -207,8 +207,11 @@ for row in graph_data.iloc[1:32, 0]:
 New = BGraph()
 New.v2(np.unique(np.array(np.matrix(graph_edges)[:,1])).tolist())
 New.v1(np.unique(np.array(np.matrix(graph_edges)[:,0])).tolist())
-New.edges(graph_edges)
-plotBGraph(New)
+
+for i in range(len(graph_edges)):
+    New.edges(graph_edges[:i])
+    plotBGraph(New)
+    #plt.show()
 
 bary_sort(np.vectorize(bary)(New, New.v1(), 1), New.v1())
 
