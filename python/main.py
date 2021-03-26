@@ -5,6 +5,7 @@
 @author: Bruno Ferrari
 """
 %cd C:\Users\Bruno Ferrari\Documents\Bruno\2019\2s\MC\artigos revisão\Artigos Mes\GD\bdp
+%cd C:\Users\bferrari\Desktop\pessoal\bdp\
 
 import numpy as np
 import pandas as pd
@@ -55,12 +56,12 @@ print('N crossing:', New.n_cross())
 
 stop = 0
 while stop==0:
-    New.v1(bary_sort(np.vectorize(bary)(New, New.v1(), 1), New.v1()))
+    New.v1( bgraph.bary_sort(np.vectorize( bgraph.bary)(New, New.v1(), 1), New.v1()))
     bgraph.plotBGraph(New)
     plt.show()
     print('N crossing:', New.n_cross())
     
-    New.v2(bary_sort(np.vectorize(bary)(New, New.v2(), 2), New.v2()))
+    New.v2( bgraph.bary_sort(np.vectorize( bgraph.bary)(New, New.v2(), 2), New.v2()))
     bgraph.plotBGraph(New)
     plt.show()
     print('N crossing:', New.n_cross())
