@@ -17,6 +17,8 @@ import bgraph
 G = nx.bipartite.gnmk_random_graph(3,5,10, seed=111)
 
 top = nx.bipartite.sets(G)[0]
+G.add_nodes_from
+
 pos = nx.bipartite_layout(G, top)
 
 nx.draw(G, pos)
@@ -112,7 +114,7 @@ def crossing(G):
             elif pi(G.v1(), i) > pi(G.v1(), j) and pi(G.v2(), k) < pi(G.v2(), l):
                 c+=1  
     return c
-
+nx.Graph()
 
 class BGraph:
     
@@ -171,8 +173,8 @@ class BGraph:
         #self.n_v2 = len(self.v2)
         return len(self.set_v2)
             
-    def n_edge(self, n):
-        self.n_edge = n
+    def n_edge(self):
+        self.n_edge = len(self.edges)
         
     def density(self):
         return len(self.set_edges) / (len(self.set_v1)*len(self.set_v2))
