@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+import pandas as pd
        
 def pi(setlist, i):
         try:
@@ -23,15 +24,10 @@ def crossing(G):
             j = e2[0]
             l = e2[1]
             
-            # if pi(G.v1(), i) < pi(G.v1(), j) and pi(G.v2(), k) > pi(G.v2(), l):
-            #     c+=1
-            # elif pi(G.v1(), i) > pi(G.v1(), j) and pi(G.v2(), k) < pi(G.v2(), l):
-            #     c+=1  
-            
-            if G.pi_1[i] < G.pi_1[j] and G.pi_2[k] > G.pi_2[l]:
-                c+=1
-            elif G.pi_1[i] > G.pi_1[j] and G.pi_2[k] < G.pi_2[l]:
-                c+=1
+            if (G.pi_1[i] < G.pi_1[j]) and (G.pi_2[k] > G.pi_2[l]) and (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
+                c = c + 1
+            elif (G.pi_1[i] > G.pi_1[j]) and (G.pi_2[k] < G.pi_2[l]) and (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
+                c = c + 1
     return c
 
 
