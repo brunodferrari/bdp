@@ -158,6 +158,18 @@ plt.title("N crossing: "+ str(bgraph.crossing(New)) )
 plt.show()
 
 
+U_1 = New.v1().copy()
+U_2 = New.v2().copy()
+
+
+Pr_list = list(New.degree().values()) / np.array(list(New.degree().values())).sum()
+Pr_dict = dict(zip(New.degree().keys(),  Pr_list) )
+
+v = random.choices(list(Pr_dict.keys()),weights=Pr_list)
+    
+(New.pi_1 > bc_v() and New.pi_1 < New.pi_1[v] ) + 1 
+
+
 # New.degree(U_linha, [2])
 
 # G = nx.bipartite.gnmk_random_graph(3,5,10, seed=111)
