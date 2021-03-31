@@ -132,6 +132,81 @@ def construction_phase(G, U_1, U_2, V, alpha=1.0):
             if pos in pos_assing: pos = max(pos_assing) + 1
             New.pi_2[v] = pos
 
+def improvement_phase(G, U_1, U_2, V):
+    Pr_list = list(New.degree().values()) / np.array(list(New.degree().values())).sum()
+    Pr_dict = dict(zip(New.degree().keys(),  Pr_list) ) #vetor de probabilidades
+    
+    while len(U_1 + U_2) > 0:
+    
+        v = random.choices(list(Pr_dict.keys()),weights=list(Pr_dict.values()))[0]
+        Pr_dict.pop(v)
+        cross_i = New.n_cross()
+        print(cross_i)
+        try:
+            U_1.remove(v)
+            bc_v = New.bc(v, k=1)
+               
+            fbc_v = np.floor(bc_v).astype(int)
+            cbc_v = np.ceil(bc_v).astype(int)
+            pi_aux = New.pi_1.copy()
+        
+            pi_f = New.move_v1(v, fbc_v)
+            New.pi_1 = pi_f
+            f_ncross =  New.n_cross()
+            
+            pi_c = New.move_v1(v, cbc_v)
+            New.pi_1 = pi_c
+            c_ncross = New.n_cross()
+            
+            f_1_ncross = np.inf
+            pi_f_1 = pi_aux
+            if fbc_v - 1 > 0:
+                pi_f_1 = New.move_v1(v, fbc_v-1)
+                New.pi_1 = pi_f_1
+                f_1_ncross = New.n_cross()
+            
+            c_1_ncross = np.inf
+            pi_c_1 = pi_aux
+            if cbc_v + 1 < New.n_v1():
+                pi_c_1 = New.move_v1(v, cbc_v + 1)
+                New.pi_1 = pi_c_1
+                c_1_ncross = New.n_cross()
+            
+            New.pi_1 = min( [(c_ncross, pi_c),(f_ncross, pi_f), \
+                             (f_1_ncross, pi_f_1), (c_1_ncross, pi_c_1), (cross_i, pi_aux)], key=lambda x: x[0])[1]
+        except ValueError:
+            U_2.remove(v)
+            bc_v = New.bc(v, k=2)
+               
+            fbc_v = np.floor(bc_v).astype(int)
+            cbc_v = np.ceil(bc_v).astype(int)
+            pi_aux = New.pi_2.copy()
+        
+            pi_f = New.move_v2(v, fbc_v)
+            New.pi_2 = pi_f
+            f_ncross =  New.n_cross()
+            
+            pi_c = New.move_v2(v, cbc_v)
+            New.pi_2 = pi_c
+            c_ncross = New.n_cross()
+            
+            f_1_ncross = np.inf
+            pi_f_1 = pi_aux
+            if fbc_v - 1 > 0:
+                pi_f_1 = New.move_v2(v, fbc_v-1)
+                New.pi_2 = pi_f_1
+                f_1_ncross = New.n_cross()
+            
+            c_1_ncross = np.inf
+            pi_c_1 = pi_aux
+            if cbc_v + 1 < New.n_v2():
+                pi_c_1 = New.move_v2(v, cbc_v + 1)
+                New.pi_2 = pi_c_1
+                c_1_ncross = New.n_cross()
+            
+            New.pi_2 = min( [(c_ncross, pi_c), (f_ncross, pi_f), \
+                             (f_1_ncross, pi_f_1), (c_1_ncross, pi_c_1), (cross_i, pi_aux)], key=lambda x: x[0] )[1]
+    
 
 
 New = bgraph.BGraph()
@@ -161,15 +236,12 @@ plt.show()
 U_1 = New.v1().copy()
 U_2 = New.v2().copy()
 
-
-Pr_list = list(New.degree().values()) / np.array(list(New.degree().values())).sum()
-Pr_dict = dict(zip(New.degree().keys(),  Pr_list) )
-
-v = random.choices(list(Pr_dict.keys()),weights=Pr_list)
-    
-(New.pi_1 > bc_v() and New.pi_1 < New.pi_1[v] ) + 1 
-
-
+improvement_phase(New, U_1, U_2, V)
+New.order_v1()
+New.order_v2()
+bgraph.plotBGraph(New)
+plt.title("N crossing: "+ str(bgraph.crossing(New)) )
+plt.show()
 # New.degree(U_linha, [2])
 
 # G = nx.bipartite.gnmk_random_graph(3,5,10, seed=111)

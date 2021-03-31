@@ -211,3 +211,29 @@ class BGraph:
             
         
         return deg
+    
+    def move_v1(self, v, pos):
+        
+        aux = self.pi_1.copy()
+        pos_v = aux.pop(v)
+        aux = np.array(list(aux.items()))
+        aux[ aux[:,1] >= pos_v, 1] = aux[ aux[:,1] >= pos_v, 1] - 1
+        aux[ aux[:,1] >= pos, 1] = aux[ aux[:,1] >= pos, 1] + 1
+        aux = dict(aux)
+        aux[v] = pos   
+                
+        return aux
+    
+    def move_v2(self, v, pos):
+        
+        aux = self.pi_2.copy()
+        pos_v = aux.pop(v)
+        aux = np.array(list(aux.items()))
+        aux[ aux[:,1] >= pos_v, 1] = aux[ aux[:,1] >= pos_v, 1] - 1
+        aux[ aux[:,1] >= pos, 1] = aux[ aux[:,1] >= pos, 1] + 1
+        aux = dict(aux)
+        aux[v] = pos   
+                
+        return aux
+    
+     
