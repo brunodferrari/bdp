@@ -86,18 +86,23 @@ def bary_sort(barylist, nodelist):
 
 #encontra baricentro do vertice
 def bary(G, v, v_layer = None):
-    
+    b = 0
     if v_layer == None:
         return
     elif v_layer == 1: 
         pi_k = G.v2()
         K = [x for x in pi_k if (((v, x) in G.edges()) or ((x, v) in G.edges())) and G.pi_2[x] > 0] #encontra os viznho do vertice v na 2a camada
-        return G.perm_v2(K).mean()    
+        if len(K) > 0:
+            b = G.perm_v2(K).mean()    
     elif v_layer == 2:
         pi_k = G.v1()
         #K = [x for x in pi_k if (x, v) in G.edges()] #encontra os viznho do vertice v na 1a camada
         K = [x for x in pi_k if (((v, x) in G.edges()) or ((x, v) in G.edges())) and G.pi_1[x] > 0]
-        return G.perm_v1(K).mean()
+        if len(K) > 0:
+            b = G.perm_v1(K).mean()
+
+    return b
+
 
 class BGraph:
 

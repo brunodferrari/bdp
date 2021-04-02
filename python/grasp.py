@@ -18,7 +18,7 @@ The GRASPH META-HEURISTC for bdp works in the two main phases:
 
 
 """
-#%cd C:\Users\bferrari\Desktop\pessoal\bdp\
+#%cd C:\Users\bferrari\Desktop\pessoal\bdp\python
 
 import random
 import matplotlib.pyplot as plt
@@ -26,24 +26,14 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
-
 #from python 
 import bgraph
-graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.3_0.2_2.txt")
 
-graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
+from datetime import datetime
+inicio = datetime.now()
+inicio_time = inicio.strftime("%H:%M:%S")
+print("Current Time =", inicio_time)
 
-graph_edges = []
-for row in graph_data.iloc[1:26, 0]:
-    for adj in row.split(" ")[2:]:
-        if int(adj) not in graph_adj_nodes_incre: 
-            graph_edges.append(( int(row.split(" ")[1]), int(adj)))
-
-graph_edges2 = []
-for row in graph_data.iloc[1:32, 0]:
-    for adj in row.split(" ")[2:]:
-        if int(adj) not in graph_adj_nodes_incre: 
-            graph_edges2.append(( int(row.split(" ")[1]), int(adj)))
 
 def greedy_selection(G, alpha=1.0, nodelist=None, subgraph=None):
     
@@ -207,6 +197,21 @@ def improvement_phase(G, U_1, U_2, V):
             G.pi_2 = min( [(c_ncross, pi_c), (f_ncross, pi_f), \
                              (f_1_ncross, pi_f_1), (c_1_ncross, pi_c_1), (cross_i, pi_aux)], key=lambda x: x[0] )[1]
     
+#graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.3_0.2_1.txt")
+graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.065_0.2_4.txt")
+graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
+
+graph_edges = []
+for row in graph_data.iloc[1:26, 0]:
+    for adj in row.split(" ")[2:]:
+        if int(adj) not in graph_adj_nodes_incre: 
+            graph_edges.append(( int(row.split(" ")[1]), int(adj)))
+
+graph_edges2 = []
+for row in graph_data.iloc[1:32, 0]:
+    for adj in row.split(" ")[2:]:
+        if int(adj) not in graph_adj_nodes_incre: 
+            graph_edges2.append(( int(row.split(" ")[1]), int(adj)))
 
 
 New = bgraph.BGraph()
