@@ -198,7 +198,7 @@ def improvement_phase(G, U_1, U_2, V):
                              (f_1_ncross, pi_f_1), (c_1_ncross, pi_c_1), (cross_i, pi_aux)], key=lambda x: x[0] )[1]
     
 #graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.3_0.2_1.txt")
-graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/stallman_reduced/G_00_02_scr_0001_10.txt")
+graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/stallman_reduced/G_00_02_scr_0002_30.txt")
 graph_adj_nodes_incre = graph_data.iloc[-6:,0].str.split(" ",expand=True).iloc[:, 1].astype(int).to_list()
 
 graph_data_exp = graph_data.iloc[:,0].str.split(" ",expand=True)

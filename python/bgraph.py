@@ -24,9 +24,9 @@ def crossing(G):
             j = e2[0]
             l = e2[1]
             
-            if (G.pi_1[i] < G.pi_1[j]) and (G.pi_2[k] > G.pi_2[l]) and (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
+            if (G.pi_1[i] < G.pi_1[j]) * (G.pi_2[k] > G.pi_2[l]) * (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
                 c = c + 1
-            elif (G.pi_1[i] > G.pi_1[j]) and (G.pi_2[k] < G.pi_2[l]) and (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
+            elif (G.pi_1[i] > G.pi_1[j]) * (G.pi_2[k] < G.pi_2[l]) * (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
                 c = c + 1
     return c
 
