@@ -31,7 +31,7 @@ def crossing(G):
     return c
 
 
-def bdp_lyt(G): ## Formata lyt adequado para o plot do grafo
+def bdp_lyt(G, size = 4/3, height = 100): ## Formata lyt adequado para o plot do grafo
     
     import numpy as np
     #G, center = _process_params(G, center=center, dim=2)
@@ -44,7 +44,7 @@ def bdp_lyt(G): ## Formata lyt adequado para o plot do grafo
     bottom = G.v2()[::-1]
 
     height = 100
-    width = (4/3) * height
+    width = size * height
     offset = (width/2, height/2)
 
     nodes = top + bottom
@@ -64,14 +64,14 @@ def bdp_lyt(G): ## Formata lyt adequado para o plot do grafo
 
 
 #plot utilizando o lyt adequado
-def plotBGraph(G):
+def plotBGraph(G, size = 4/3, height=100):
     
     B = nx.Graph()
     B.add_nodes_from(G.v1(), bipartite=1)
     B.add_nodes_from(G.v2(), bipartite=2)
     B.add_edges_from(G.edges())
     
-    pos = bdp_lyt(G)    
+    pos = bdp_lyt(G, size, height)    
     nx.draw(B, pos)
     nx.draw_networkx_labels(B, pos)
     #plt.savefig("test.pdf")    
