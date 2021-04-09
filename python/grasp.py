@@ -232,6 +232,7 @@ New.pi_2 = order_2
 New.order_v1()
 New.order_v2()
 New.edges(graph_edges)
+
 bgraph.plotBGraph(New, size=20/2, height=150)
 plt.title("N crossing: "+ str(bgraph.crossing(New)) )
 plt.show()
