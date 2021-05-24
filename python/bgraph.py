@@ -241,4 +241,5 @@ class BGraph:
                 
         return aux
     
-     
+    def plot(self, size=4/3, height=100):
+        plotBGraph(self, size=size, height=height)

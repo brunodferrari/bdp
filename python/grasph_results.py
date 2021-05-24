@@ -19,7 +19,8 @@ from grasp import grasp as gs
 # inicio_time = inicio.strftime("%H:%M:%S")
 
 
-df_results = pd.read_excel("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/stallman_reduced.xlsx", sheet_name="Sheet1")[136:]
+#df_results = pd.read_excel("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/stallman_reduced.xlsx", sheet_name="Sheet1")
+df_results = pd.read_excel("./dbdp_instances/stallman_reduced.xlsx", sheet_name="Sheet1")
 df_results['Crossing'] = np.nan
 df_results['Time'] = np.nan
 

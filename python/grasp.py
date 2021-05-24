@@ -207,8 +207,8 @@ def grasp(G, alpha=1.0, verbose=0):
     V = U_1 + U_2
     
     construction_phase(G, U_1, U_2, V, alpha)
-    G.order_v1()
-    G.order_v2()
+    #G.order_v1()
+    #G.order_v2()
 
     min_cross_ant = G.n_cross()
     min_cross = min_cross_ant - 1
@@ -217,15 +217,16 @@ def grasp(G, alpha=1.0, verbose=0):
         U_1 = G.v1().copy()
         U_2 = G.v2().copy()   
         
-        improvement_phase(G, U_1, U_2, V)
-        G.order_v1()
-        G.order_v2()
+        improvement_phase(G, U_1, U_2, V, verbose)
+     #   G.order_v1()
+      #  G.order_v2()
         
         min_cross_ant = min_cross
         min_cross = G.n_cross()
-        
-    G.order_v1()
-    G.order_v2()
+    
+    print('te1dasdste')    
+    #G.order_v1()
+    #G.order_v2()
         
 
 if __name__=='__main__':
