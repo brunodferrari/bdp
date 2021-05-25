@@ -241,5 +241,8 @@ class BGraph:
                 
         return aux
     
-    def plot(self, size=4/3, height=100):
+    def plot(self, size=4/3, height=100, order=0):
+        if order:
+            self.order_v1()
+            self.order_v2()
         plotBGraph(self, size=size, height=height)
