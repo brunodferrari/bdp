@@ -11,6 +11,7 @@ import networkx as nx
 
 from python import bgraph
 from python.grasp import grasp as gs
+from python.tabu_search import ts
 
 df_results = pd.read_excel("./dbdp_instances/instances.xlsx", sheet_name="instances").replace(regex=".txt", value="")
 
@@ -35,8 +36,24 @@ for i, inst in enumerate(df_results['Instance']):
     New.v1(list(order_1.keys()))
     New.v2(list(order_2.keys()))
     New.edges(graph_edges)    
-    gs(New, 0.9, 1) 
+    
+    
+    import time
+    inicio = time.time()
+    GS = New.copy()
+    gs(GS, 0.9, 1) 
+    fim = time.time()
+    (fim - inicio)
+    
+    inicio = time.time()
+    TS = New.copy()
+    ts(TS, verbose=1, max_it=20)
+    fim = time.time()
+    (fim - inicio)
 
+    
+
+    
     r2 = []
     while New.n_cross() >= 42:
         gs(New, 0.9, 1) 

@@ -13,14 +13,15 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
-#from python 
-import bgraph
+from python import bgraph
 
 from datetime import datetime
 inicio = datetime.now()
 inicio_time = inicio.strftime("%H:%M:%S")
 print("Current Time =", inicio_time)
 
+global n_cross
+n_cross = np.inf
 
 def greedy_selection(G, alpha=1.0, nodelist=None, subgraph=None):
     
@@ -109,10 +110,10 @@ def construction_phase(G, U_1, U_2, V, alpha=1.0):
             if pos in pos_assing: pos = max(pos_assing) + 1
             G.pi_2[v] = pos
 
-def __auxplot(G_aux, v):
+def __auxplot(G_aux, v, sign=" +"):
     #print(v)
     G_aux.plot(order=1)
-    plt.title(str(v) + ' +')
+    plt.title(str(v) + sign)
     plt.show()
 
 def _make_neighborhood(G, neighlist, verbose=0):
@@ -120,39 +121,59 @@ def _make_neighborhood(G, neighlist, verbose=0):
     m_plus = None
     m_minus = None
     
-    G_aux = G
+    G_aux = G.copy()
     G_pi_1_org = G.pi_1
     G_pi_2_org = G.pi_2
     
+    trsh_crossing = np.inf
     for v in neighlist:
         if v in G.v1(): #Layer 1
-            if G.pi_1[v] + 1 <= G.n_v1(): m_plus = G_aux.move_v1(v, G_aux.pi_1[v]+1)
-            if G.pi_1[v] - 1 > 0: m_minus = G_aux.move_v1(v, G_aux.pi_1[v]-1)
+            if G.pi_1[v] + 1 <= G.n_v1(): m_plus = G.move_v1(v, G.pi_1[v]+1)
+            if G.pi_1[v] - 1 > 0: m_minus = G.move_v1(v, G.pi_1[v]-1)
         
-            if m_plus is not None:
-                G_aux.pi_1 = m_plus
-                if verbose: __auxplot(G_aux, v)
-                yield (v, +1, G_aux.n_cross()) # Forma não otimizada, rever dps para evitar calculo global
+            if (m_plus is not None):
+                chg_pos = G.find_pos(v, G.pi_1[v]+1)
+                K_vj = G.K(v, chg_pos) 
+                K_jv = G.K(chg_pos, v)
+                if (n_cross + (K_jv - K_vj) < trsh_crossing):
+                    trsh_crossing = n_cross + (K_jv - K_vj)
+                    G_aux.pi_1 = m_plus
+                    if verbose: __auxplot(G_aux, v)
+                    yield (v, +1, trsh_crossing) 
             
-            if m_minus is not None:
-                G_aux.pi_1 = m_minus
-                if verbose: __auxplot(G_aux, v)
-                yield (v, -1, G_aux.n_cross()) # Forma não otimizada, rever dps para evitar calculo global
+            if (m_minus is not None):               
+                chg_pos = G.find_pos(v, G.pi_1[v]-1)
+                K_vj = G.K(v, chg_pos) 
+                K_jv = G.K(chg_pos, v)
+                if (n_cross + (K_vj - K_jv) < trsh_crossing):
+                    trsh_crossing = n_cross + (K_vj-K_jv)
+                    G_aux.pi_1 = m_minus
+                    if verbose: __auxplot(G_aux, v, " -")
+                    yield (v, -1, trsh_crossing) 
         
         else:           #Layer 2
-            if G.pi_2[v] + 1 <= G.n_v2(): m_plus = G_aux.move_v2(v, G_aux.pi_2[v]+1)
-            if G.pi_2[v] - 1 > 0: m_minus = G_aux.move_v2(v, G_aux.pi_2[v]-1)
+            if G.pi_2[v] + 1 <= G.n_v2(): m_plus = G.move_v2(v, G.pi_2[v]+1)
+            if G.pi_2[v] - 1 > 0: m_minus = G.move_v2(v, G.pi_2[v]-1)
             
-            if m_plus is not None:
-                G_aux.pi_2 = m_plus
-                if verbose: __auxplot(G_aux, v)
-                yield (v, +1, G_aux.n_cross()) # Forma não otimizada, rever dps para evitar calculo global
-            
-            if m_minus is not None:
-                G_aux.pi_2 = m_minus
-                if verbose: __auxplot(G_aux, v)
-                yield (v, -1, G_aux.n_cross()) # Forma não otimizada, rever dps para evitar calculo global
-        
+            if (m_plus is not None):
+                chg_pos = G.find_pos(v, G.pi_2[v]+1)
+                K_vj = G.K(v, chg_pos) 
+                K_jv = G.K(chg_pos, v)
+                if (n_cross + (K_jv - K_vj) < trsh_crossing):
+                    trsh_crossing = n_cross + (K_jv - K_vj)
+                    G_aux.pi_2 = m_plus
+                    if verbose: __auxplot(G_aux, v)
+                    yield (v, +1, trsh_crossing) 
+            if (m_minus is not None):
+                chg_pos = G.find_pos(v, G.pi_2[v]-1)
+                K_vj = G.K(v, chg_pos) 
+                K_jv = G.K(chg_pos, v)
+                if (n_cross + (K_vj - K_jv) < trsh_crossing):
+                    trsh_crossing = n_cross + (K_vj-K_jv)
+                    G_aux.pi_2 = m_minus
+                    if verbose: __auxplot(G_aux, v, " -")
+                    yield (v, -1, trsh_crossing) 
+
         m_plus = None
         m_minus = None
         G_aux.pi_1 = G_pi_1_org
@@ -162,19 +183,22 @@ def improvement_phase(G, V, ternure=9, verbose=0):
     
     tabu_dict = dict(zip(V, [-ternure]*len(V))) 
     
-    min_cross = G.n_cross()
+    global n_cross
+    
+    min_cross = n_cross #G.n_cross()
+
     G_pi_1_min = G.pi_1
     G_pi_2_min = G.pi_2
     
     i=0
     neigh_list = V
     neigh_set = list(_make_neighborhood(G, neigh_list))
-    neigh_set.sort(key=lambda x:x[-1])
     while neigh_list:
         
-        neigh_tup = neigh_set[0]
+        neigh_tup = neigh_set[-1]
         tabu_dict[neigh_tup[0]] = i
         cross = neigh_tup[2]
+        n_cross = cross
         
         v = neigh_tup[0]
         if v in G.v1():
@@ -190,10 +214,11 @@ def improvement_phase(G, V, ternure=9, verbose=0):
         i = i + 1        
         neigh_list = [v for v in V if (i - tabu_dict[v]) > ternure ]
         neigh_set = list(_make_neighborhood(G, neigh_list))
-        neigh_set.sort(key=lambda x:x[-1])
+        
         
     G.pi_1 = G_pi_1_min
     G.pi_2 = G_pi_2_min
+    n_cross = min_cross
     return min_cross
     
 def ts(G, alpha=1.0, max_it=10, verbose=0):
@@ -203,15 +228,17 @@ def ts(G, alpha=1.0, max_it=10, verbose=0):
     V = U_1 + U_2
     
     construction_phase(G, U_1, U_2, V, alpha)
-    #G.order_v1()
-    #G.order_v2()
-
-    min_c = G.n_cross()
-
+    G.order_v1()
+    G.order_v2()
+    global n_cross
+    n_cross = G.n_cross()
+    min_c = n_cross
+    
     it = 0
     while it < max_it:
-        if verbose: print(it, ":", str(min_c))
         C = improvement_phase(G, V, len(V))
+        if verbose: 
+            print(it, ":", str(min_c), "::", C, ":::", G.n_cross())
         if C < min_c:
             it = 0
             min_c = C
@@ -221,7 +248,8 @@ def ts(G, alpha=1.0, max_it=10, verbose=0):
         
 
 if __name__=='__main__':
-    path="C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.065_0.2_1.txt"
+    #path="C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.065_0.2_1.txt"
+    path="./dbdp_instances/instances/incgraph_25_25_0.065_0.2_1.txt"
     graph_data = pd.read_csv(path)
     
     graph_data_exp = graph_data.iloc[:,0].str.split(" ",expand=True)

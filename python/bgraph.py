@@ -4,7 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
+import copy
        
+
 def pi(setlist, i):
         try:
             return np.int(np.where(np.array(setlist) == i )[0])
@@ -108,46 +110,79 @@ class BGraph:
 
     """ aux """
     def __init__(self):
-        self.set_v1 = []
-        self.set_v2 = []
-        self.set_edges = []
+        self._set_v1 = []
+        self._set_v2 = []
+        self._set_edges = []
         self.pi_1 = {}
         self.pi_2 = {}
-                 
+        self._adj = {}
+        self._nodes = {}
+        
+    @property
+    def adj(self):
+        return self._adj
+    
+    def __getitem__(self, n):
+        return self.adj[n]
+    
     def edges(self, edgelist = None):
         if edgelist != None:
-            self.set_edges = []
-            self.set_edges = edgelist
+            self._set_edges = []
+            self._set_edges = edgelist
+            
+            for e in edgelist:
+                u, v = e
+                
+                if u not in self._nodes:
+                     self._adj[u] = {}
+                     self._nodes[u] = {}
+                if v not in self._nodes:
+                     self._adj[v] = {}
+                     self._nodes[v] = {}
+                
+                datadict = self._adj[u].get(v, {})
+                self._adj[u][v] = datadict
+                self._adj[v][u] = datadict
         else:
-            return self.set_edges
+            return self._set_edges
     
     def v1 (self, setlist = None):
         if setlist != None:
-            self.set_v1 = []
-            self.set_v1 = setlist
-            self.pi_1 = dict(zip(self.set_v1,self.perm_v1()))
+            self._set_v1 = []
+            self._set_v1 = setlist
+            self.pi_1 = dict(zip(self._set_v1,self.perm_v1()))
+            
+            for u in setlist:
+                if u not in self._nodes: 
+                    self._nodes[u] = {}
+                    self._adj[u] = {}
         else:
-            return self.set_v1
+            return self._set_v1
         
     def v2 (self, setlist = None):
         if setlist != None:
-            self.set_v2 = []
-            self.set_v2 = setlist
-            self.pi_2 = dict(zip(self.set_v2, self.perm_v2()))
+            self._set_v2 = []
+            self._set_v2 = setlist
+            self.pi_2 = dict(zip(self._set_v2, self.perm_v2()))
+            
+            for u in setlist:
+                if u not in self._nodes: 
+                    self._nodes[u] = {}
+                    self._adj[u] = {}
         else:
-            return self.set_v2
+            return self._set_v2
     
     def perm_v1(self, pos = None):
         if pos != None:
             return np.vectorize(lambda i: self.pi_1[i])(pos)
         else:
-            return np.vectorize(lambda i: pi(self.set_v1, i))(self.set_v1) + 1
+            return np.vectorize(lambda i: pi(self._set_v1, i))(self._set_v1) + 1
 
     def perm_v2(self, pos = None):
         if pos != None:
             return np.vectorize(lambda i: self.pi_2[i])(pos)
         else:
-            return np.vectorize(lambda i: pi(self.set_v2, i))(self.set_v2) + 1
+            return np.vectorize(lambda i: pi(self._set_v2, i))(self._set_v2) + 1
     
     def order_v1(self):
         #aux = [(pos, v) for (pos, v) in zip(self.pi_1, self. set_v1)]
@@ -165,29 +200,29 @@ class BGraph:
     
     def add_v1(self, i, pos):
         if pos != -1: 
-            self.set_v1 = self.v1()[:pos] + [i] + self.v1()[pos:]
+            self._set_v1 = self.v1()[:pos] + [i] + self.v1()[pos:]
         else:
-            self.set_v1 = self.v1()[:] + [i]
+            self._set_v1 = self.v1()[:] + [i]
         
     def add_v2(self, i, pos):
         if pos != -1: 
-            self.set_v2 = self.v2()[:pos] + [i] + self.v2()[pos:]
+            self._set_v2 = self.v2()[:pos] + [i] + self.v2()[pos:]
         else:
-            self.set_v2 = self.v2()[:] + [i]
+            self._set_v2 = self.v2()[:] + [i]
     
     def n_v1(self):
         #self.n_v1 = len(self.v1)
-        return len(self.set_v1)
+        return len(self._set_v1)
         
     def n_v2(self):
         #self.n_v2 = len(self.v2)
-        return len(self.set_v2)
+        return len(self._set_v2)
             
     def n_edge(self):
-        self.n_edge = len(self.set_edges)
+        self.n_edge = len(self._set_edges)
         
     def density(self):
-        return len(self.set_edges) / (len(self.set_v1)*len(self.set_v2))
+        return len(self._set_edges) / (len(self._set_v1)*len(self._set_v2))
         
     def n_cross(self):
         return crossing(self)
@@ -217,7 +252,7 @@ class BGraph:
         
         return deg
     
-    def move_v1(self, v, pos):
+    def move_v1(self, v, pos, inplace=False):
         
         aux = self.pi_1.copy()
         pos_v = aux.pop(v)
@@ -227,9 +262,12 @@ class BGraph:
         aux = dict(aux)
         aux[v] = pos   
                 
-        return aux
+        if not inplace:
+            return aux
+        else:
+            self.pi_1 = aux
     
-    def move_v2(self, v, pos):
+    def move_v2(self, v, pos, inplace=False):
         
         aux = self.pi_2.copy()
         pos_v = aux.pop(v)
@@ -239,10 +277,52 @@ class BGraph:
         aux = dict(aux)
         aux[v] = pos   
                 
-        return aux
+        if not inplace:
+            return aux
+        else:
+            self.pi_2 = aux
     
     def plot(self, size=4/3, height=100, order=0):
         if order:
             self.order_v1()
             self.order_v2()
         plotBGraph(self, size=size, height=height)
+        
+    
+    def K(self, u, v):
+        i = u
+        j = v
+    
+        #G.move_v1(i, j, True)
+        #G.move_v1(j, i, True)
+        
+        c = 0
+         
+        if u in self._set_v1:
+            pi = self.pi_2
+        elif u in self._set_v2:
+            pi = self.pi_1
+        #nodes_between = [v for v in G.pi_1 if G.pi_1[v] >= G.pi_1[i] and G.pi_1[v] <= G.pi_1[j]]
+            
+        #while nodes_between:
+        #    i = nodes_between.pop()
+        #    for j in nodes_between:
+        #print(pi)            
+        for k in self._adj[i]:
+            for l in self._adj[j]:
+                if (pi[k] > pi[l]):
+                    c = c + 1
+                            
+        return c
+    
+    def find_pos(self, u, pos):
+        
+        if u in self._set_v1:
+            pi = self.pi_1
+        elif u in self._set_v2:
+            pi = self.pi_2
+        
+        return [u for u in pi if pi[u] == pos][0]
+    
+    def copy(self):
+        return copy.deepcopy(self)
