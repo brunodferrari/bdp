@@ -13,6 +13,9 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 
+from heapq import nlargest as maxq
+#import heapq as max_q
+
 from python import bgraph
 
 from datetime import datetime
@@ -26,7 +29,7 @@ n_cross = np.inf
 def greedy_selection(G, alpha=1.0, nodelist=None, subgraph=None):
     
     deg_dict = G.degree(nodelist, subgraph)
-    deg_max = max(deg_dict.values())
+    deg_max = maxq(1, deg_dict.values())[0]
     mask = np.array(list(deg_dict.values()), dtype=int) >= alpha * deg_max
     idx = np.random.choice( np.where(mask)[0] )
     v = list(deg_dict.keys())[idx]
@@ -118,66 +121,67 @@ def __auxplot(G_aux, v, sign=" +"):
 
 def _make_neighborhood(G, neighlist, verbose=0):
     
-    m_plus = None
-    m_minus = None
-    
-    G_aux = G.copy()
-    G_pi_1_org = G.pi_1
-    G_pi_2_org = G.pi_2
+    if verbose:
+        G_aux = G.copy()
+        G_pi_1_org = G.pi_1
+        G_pi_2_org = G.pi_2
     
     trsh_crossing = np.inf
     for v in neighlist:
         if v in G.v1(): #Layer 1
-            if G.pi_1[v] + 1 <= G.n_v1(): m_plus = G.move_v1(v, G.pi_1[v]+1)
-            if G.pi_1[v] - 1 > 0: m_minus = G.move_v1(v, G.pi_1[v]-1)
-        
-            if (m_plus is not None):
+            if G.pi_1[v] + 1 <= G.n_v1(): 
+            #if (m_plus is not None):
                 chg_pos = G.find_pos(v, G.pi_1[v]+1)
                 K_vj = G.K(v, chg_pos) 
                 K_jv = G.K(chg_pos, v)
                 if (n_cross + (K_jv - K_vj) < trsh_crossing):
                     trsh_crossing = n_cross + (K_jv - K_vj)
-                    G_aux.pi_1 = m_plus
-                    if verbose: __auxplot(G_aux, v)
-                    yield (v, +1, trsh_crossing) 
-            
-            if (m_minus is not None):               
+                    if verbose: 
+                        G_aux.pi_1 = G.move_v1(v, G.pi_1[v]+1)
+                        __auxplot(G_aux, v)
+                    yield (v, +1, trsh_crossing)
+                
+            if G.pi_1[v] - 1 > 0:
+            #if (m_minus is not None):               
                 chg_pos = G.find_pos(v, G.pi_1[v]-1)
                 K_vj = G.K(v, chg_pos) 
                 K_jv = G.K(chg_pos, v)
                 if (n_cross + (K_vj - K_jv) < trsh_crossing):
                     trsh_crossing = n_cross + (K_vj-K_jv)
-                    G_aux.pi_1 = m_minus
-                    if verbose: __auxplot(G_aux, v, " -")
+                    if verbose: 
+                        G_aux.pi_1 = G.move_v1(v, G.pi_1[v]-1)
+                        __auxplot(G_aux, v, " -")
                     yield (v, -1, trsh_crossing) 
         
         else:           #Layer 2
-            if G.pi_2[v] + 1 <= G.n_v2(): m_plus = G.move_v2(v, G.pi_2[v]+1)
-            if G.pi_2[v] - 1 > 0: m_minus = G.move_v2(v, G.pi_2[v]-1)
-            
-            if (m_plus is not None):
+            if G.pi_2[v] + 1 <= G.n_v2(): 
+            #if (m_plus is not None):
                 chg_pos = G.find_pos(v, G.pi_2[v]+1)
                 K_vj = G.K(v, chg_pos) 
                 K_jv = G.K(chg_pos, v)
                 if (n_cross + (K_jv - K_vj) < trsh_crossing):
                     trsh_crossing = n_cross + (K_jv - K_vj)
-                    G_aux.pi_2 = m_plus
-                    if verbose: __auxplot(G_aux, v)
-                    yield (v, +1, trsh_crossing) 
-            if (m_minus is not None):
+                    if verbose: 
+                        G_aux.pi_2 = G.move_v1(v, G.pi_2[v]+1)
+                        __auxplot(G_aux, v)
+                    yield (v, +1, trsh_crossing)
+                
+            if G.pi_2[v] - 1 > 0:
+            #if (m_minus is not None):               
                 chg_pos = G.find_pos(v, G.pi_2[v]-1)
                 K_vj = G.K(v, chg_pos) 
                 K_jv = G.K(chg_pos, v)
                 if (n_cross + (K_vj - K_jv) < trsh_crossing):
                     trsh_crossing = n_cross + (K_vj-K_jv)
-                    G_aux.pi_2 = m_minus
-                    if verbose: __auxplot(G_aux, v, " -")
+                    if verbose: 
+                        G_aux.pi_2 = G.move_v1(v, G.pi_2[v]-1)
+                        __auxplot(G_aux, v, " -")
                     yield (v, -1, trsh_crossing) 
+        
+        if verbose:
+            G_aux.pi_1 = G_pi_1_org
+            G_aux.pi_2 = G_pi_2_org
 
-        m_plus = None
-        m_minus = None
-        G_aux.pi_1 = G_pi_1_org
-        G_aux.pi_2 = G_pi_2_org
 
 def improvement_phase(G, V, ternure=9, verbose=0):
     
@@ -238,7 +242,7 @@ def ts(G, alpha=1.0, max_it=10, verbose=0):
     while it < max_it:
         C = improvement_phase(G, V, len(V))
         if verbose: 
-            print(it, ":", str(min_c), "::", C, ":::", G.n_cross())
+            print(it, ":", str(min_c), "::", C)#, ":::", G.n_cross())
         if C < min_c:
             it = 0
             min_c = C

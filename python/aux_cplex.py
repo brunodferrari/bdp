@@ -41,13 +41,16 @@ for i, inst in enumerate(df_results['Instance']):
     import time
     inicio = time.time()
     GS = New.copy()
-    gs(GS, 0.9, 1) 
+    gs(GS, 0.9, 0) 
     fim = time.time()
     (fim - inicio)
     
+    
+    %%snakeviz
     inicio = time.time()
     TS = New.copy()
-    ts(TS, verbose=1, max_it=20)
+    ts(TS, verbose=1, max_it=5)
+    print(TS.n_cross())
     fim = time.time()
     (fim - inicio)
 

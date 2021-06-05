@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
 import copy
-       
+
+from numba import njit
+from numba.typed import Dict, List
+from numba.core import types
 
 def pi(setlist, i):
         try:
@@ -105,6 +108,17 @@ def bary(G, v, v_layer = None):
 
     return b
 
+@njit
+def _deg(nodelist, subgraph, edges):
+    deg = Dict.empty(
+        key_type=types.int64,
+        value_type=types.int64,
+                    )
+    for v in nodelist:
+            K = [x for x in subgraph if ((v, x) in edges) or ((x, v) in edges)]
+            deg[v] = len(K)
+    
+    return deg
 
 class BGraph:
 
@@ -230,8 +244,10 @@ class BGraph:
     def bc(self, v, k):
         return bary(self, v, k)
     
+    #@jit(nopython=True)
     def degree(self, nodelist = None, subgraph = None):
-        deg = {}
+        #deg = {}
+        
         if nodelist is None:
             nodelist = (self.v1() + self.v2())
         
@@ -245,12 +261,10 @@ class BGraph:
         #     K = [x for x in self.v1() if (x, v) in self.edges()]
         #     deg[v] = len(K)
         
-        for v in nodelist:
-            K = [x for x in subgraph if ((v, x) in self.edges()) or ((x, v) in self.edges())]
-            deg[v] = len(K)
+        d = _deg(List(nodelist), List(subgraph), List(self.edges()))
             
-        
-        return deg
+    
+        return d
     
     def move_v1(self, v, pos, inplace=False):
         
