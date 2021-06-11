@@ -45,14 +45,15 @@ for i, inst in enumerate(df_results['Instance']):
     fim = time.time()
     (fim - inicio)
     
-    
     %%snakeviz
-    inicio = time.time()
-    TS = New.copy()
-    ts(TS, verbose=1, max_it=5)
-    print(TS.n_cross())
-    fim = time.time()
-    (fim - inicio)
+    t = []
+    for _ in range(50):
+        TS = New.copy()
+        inicio = time.time()
+        ts(TS, verbose=0, max_it=5)
+        print(TS.n_cross())
+        fim = time.time()
+        t.append(fim - inicio)
 
     
 
