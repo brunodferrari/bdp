@@ -233,8 +233,11 @@ class BGraph:
         return len(self._set_v2)
             
     def n_edge(self):
-        self.n_edge = len(self._set_edges)
+        return len(self._set_edges)
         
+    def n_v(self):
+        return len(self._nodes)
+    
     def density(self):
         return len(self._set_edges) / (len(self._set_v1)*len(self._set_v2))
         
