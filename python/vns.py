@@ -115,7 +115,7 @@ def __auxplot(G_aux, v, sign=" +"):
     G_aux.plot(order=1)
     plt.title(str(v) + sign)
     plt.show()
-
+'''
 def _make_neighborhood(G, neighlist, k=1, verbose=0):
     
     if verbose:
@@ -125,72 +125,133 @@ def _make_neighborhood(G, neighlist, k=1, verbose=0):
     
     trsh_crossing = np.inf
     idx_min = np.nan
-    for i, v in enumerate(neighlist):
-        if v[0] in G.v1(): #Layer 1
-            if (G.pi_1[v[0]] + k <= G.n_v1()) and np.sign(v[1])==1: 
+    n=len(neighlist)
+    v=neighlist.copy()
+    for i in range(n):
+        if v[i][0] in G.v1(): #Layer 1
+            if (G.pi_1[v[i][0]] + k <= G.n_v1()) and np.sign(v[i][1])==1: 
             #if (m_plus is not None):
-                chg_pos = G.find_pos(v[0], G.pi_1[v[0]]+k)
-                K_vj = G.K(v[0], chg_pos) 
-                K_jv = G.K(chg_pos, v[0])
-                v[1] = k
-                v[2] = v[2] + (K_jv - K_vj)
-                if (v[2] < trsh_crossing):
+                chg_pos = G.find_pos(v[i][0], G.pi_1[v[i][0]]+k)
+                K_vj = G.K(v[i][0], chg_pos) 
+                K_jv = G.K(chg_pos, v[i][0])
+                v[i][1] = k
+                v[i][2] = v[i][2] + (K_jv - K_vj)
+                if (v[i][2] < trsh_crossing):
                     idx_min = i
-                    trsh_crossing = v[2]
+                    trsh_crossing = v[i][2]
                 if verbose: 
-                    G_aux.pi_1 = G.move_v1(v[0], G.pi_1[v[0]]+k)
-                    __auxplot(G_aux, v[0])
-            
-            if (G.pi_1[v[0]] - k > 0) and np.sign(v[1])==-1:
+                    G_aux.pi_1 = G.move_v1(v[i][0], G.pi_1[v[i][0]]+k)
+                    __auxplot(G_aux, v[i][0])
+            elif (G.pi_1[v[i][0]] + k > G.n_v1()) and np.sign(v[i][1])==1: 
+                print(":1", neighlist.pop(i - (len(v)-len(neighlist)) ))
+                
+            if (G.pi_1[v[i][0]] - k > 0) and np.sign(v[i][1])==-1:
             #if (m_minus is not None):               
-                chg_pos = G.find_pos(v[0], G.pi_1[v[0]]-k)
-                K_vj = G.K(v[0], chg_pos) 
-                K_jv = G.K(chg_pos, v[0])
-                v[1] = -k
-                v[2] = v[2] + (K_vj - K_jv)
-                if (v[2]  < trsh_crossing):
+                chg_pos = G.find_pos(v[i][0], G.pi_1[v[i][0]]-k)
+                K_vj = G.K(v[i][0], chg_pos) 
+                K_jv = G.K(chg_pos, v[i][0])
+                v[i][1] = -k
+                v[i][2] = v[i][2] + (K_vj - K_jv)
+                if (v[i][2]  < trsh_crossing):
                     idx_min = i
-                    trsh_crossing = v[2] 
+                    trsh_crossing = v[i][2] 
                 if verbose: 
-                    G_aux.pi_1 = G.move_v1(v[0], G.pi_1[v[0]]-k)
-                    __auxplot(G_aux, v[0], " -")
-            
+                    G_aux.pi_1 = G.move_v1(v[i][0], G.pi_1[v[i][0]]-k)
+                    __auxplot(G_aux, v[i][0], " -")
+            elif (G.pi_1[v[i][0]] - k <= 0) and np.sign(v[i][1])==-1: 
+                print(":2", neighlist.pop(i - (len(v)-len(neighlist)) ))
         else:           #Layer 2
-            if (G.pi_2[v[0]] + k <= G.n_v2()) and np.sign(v[1])==1: 
+            if (G.pi_2[v[i][0]] + k <= G.n_v2()) and np.sign(v[i][1])==1: 
             #if (m_plus is not None):
-                chg_pos = G.find_pos(v[0], G.pi_2[v[0]]+k)
-                K_vj = G.K(v[0], chg_pos) 
-                K_jv = G.K(chg_pos, v[0])
-                v[1] = k
-                v[2] = v[2] + (K_jv - K_vj)
-                if (v[2] < trsh_crossing):
+                chg_pos = G.find_pos(v[i][0], G.pi_2[v[i][0]]+k)
+                K_vj = G.K(v[i][0], chg_pos) 
+                K_jv = G.K(chg_pos, v[i][0])
+                v[i][1] = k
+                v[i][2] = v[i][2] + (K_jv - K_vj)
+                if (v[i][2] < trsh_crossing):
                     idx_min = i
-                    trsh_crossing = v[2]
+                    trsh_crossing = v[i][2]
                 if verbose: 
-                    G_aux.pi_2 = G.move_v1(v[0], G.pi_2[v]+k)
+                    G_aux.pi_2 = G.move_v1(v[i][0], G.pi_2[v]+k)
                     __auxplot(G_aux, v)
             
-            if (G.pi_2[v[0]] - k > 0) and np.sign(v[1])==-1:
+            elif (G.pi_2[v[i][0]] + k > G.n_v2()) and np.sign(v[i][1])==1: 
+                print(":3", neighlist.pop(i - (len(v)-len(neighlist)) ))
+            
+            if (G.pi_2[v[i][0]] - k > 0) and np.sign(v[i][1])==-1:
             #if (m_minus is not None):               
-                chg_pos = G.find_pos(v[0], G.pi_2[v[0]]-k)
-                K_vj = G.K(v[0], chg_pos) 
-                K_jv = G.K(chg_pos, v[0])
-                v[1] = -k
-                v[2] = v[2] + (K_vj - K_jv)
-                if (v[2]  < trsh_crossing):
+                chg_pos = G.find_pos(v[i][0], G.pi_2[v[i][0]]-k)
+                K_vj = G.K(v[i][0], chg_pos) 
+                K_jv = G.K(chg_pos, v[i][0])
+                v[i][1] = -k
+                v[i][2] = v[i][2] + (K_vj - K_jv)
+                if (v[i][2]  < trsh_crossing):
                     idx_min = i
-                    trsh_crossing = v[2] 
+                    trsh_crossing = v[i][2] 
                 if verbose: 
-                    G_aux.pi_2 = G.move_v1(v[0], G.pi_2[v]-k)
-                    __auxplot(G_aux, v[0], " -")
+                    G_aux.pi_2 = G.move_v1(v[i][0], G.pi_2[v]-k)
+                    __auxplot(G_aux, v[i][0], " -")
+            
+            elif (G.pi_2[v[i][0]] - k <= 0) and np.sign(v[i][1])==-1: 
+                print(":4", neighlist.pop(i - (len(v)-len(neighlist)) ))
             
         if verbose:
             G_aux.pi_1 = G_pi_1_org
             G_aux.pi_2 = G_pi_2_org
+    return idx_min
+    #neighlist.append(neighlist.pop(idx_min - ((len(v)-len(neighlist))) ))
+''' 
+
+
+
+def _eval_neighborhood(G, neighlist, k=1, verbose=0):
+
+    if verbose:
+        G_aux = G.copy()
+        G_pi_1_org = G.pi_1
+        G_pi_2_org = G.pi_2
     
-    neighlist.append(neighlist.pop(idx_min))
+    trsh_crossing = np.inf
+    idx_min = np.nan
     
-def improvement_phase(G, V, k, verbose=0):
+    for i, v in enumerate(neighlist):
+        if v[0] in G.v1(): #Layer 1
+            pi = G.pi_1
+        else:              #Layer 2 
+            pi = G.pi_2
+         
+        if (pi[v[0]] + k <= len(pi)) and np.sign(v[1])==1: 
+        #if (m_plus is not None):
+            chg_pos = G.find_pos(v[0], pi[v[0]]+k)
+            K_vj = G.K(v[0], chg_pos) 
+            K_jv = G.K(chg_pos, v[0])
+            if ((K_jv - K_vj) <= 0):
+                v[1] = k
+                v[2] = v[2] + (K_jv - K_vj)
+                if (K_jv - K_vj) < trsh_crossing: 
+                    idx_min = i
+                    trsh_crossing = v[2]
+        
+        if (pi[v[0]] - k > 0) and np.sign(v[1])==-1:
+            chg_pos = G.find_pos(v[0], pi[v[0]]-k)
+            K_vj = G.K(v[0], chg_pos) 
+            K_jv = G.K(chg_pos, v[0])
+            if ( ((K_vj - K_jv)) <= 0):
+                v[1] = -k
+                v[2] = v[2] + (K_vj - K_jv)
+                if (K_vj - K_jv) < trsh_crossing: 
+                    idx_min = i
+                    trsh_crossing = v[2] 
+    
+    r = neighlist.copy()        
+    try: 
+        r.append(r.pop(idx_min))
+        return [x for x in r if abs(x[1]) == k]
+    except: 
+        return [x for x in r if abs(x[1]) == k]
+             
+ 
+def improvement_phase(G, V, k, k_max, verbose=0):
     
     global n_cross
     
@@ -199,36 +260,30 @@ def improvement_phase(G, V, k, verbose=0):
     G_pi_1_min = G.pi_1
     G_pi_2_min = G.pi_2
     
-    i=0
-    neigh_list = V
-    neigh_set = list(_make_neighborhood(G, neigh_list))
-    while neigh_list:
+    if k==1:
+        neigh_list = [[v,i,0] for v in G._nodes for i in [np.inf,-np.inf]]
+    
+    neigh_list = _eval_neighborhood(G, neigh_list, k=1)
+    while neigh_list and k<k_max:
         
-        neigh_tup = neigh_set[-1]
-        tabu_dict[neigh_tup[0]] = i
-        cross = neigh_tup[2]
-        n_cross = cross
+        neigh_tup = neigh_list[-1]
         
-        v = neigh_tup[0]
-        if v in G.v1():
-            G.pi_1 = G.move_v1(v, G.pi_1[v] + neigh_tup[1])
-        else:
-            G.pi_2 = G.move_v2(v, G.pi_2[v] + neigh_tup[1])
-        
-        if cross < min_cross:
-            min_cross = cross
+        if n_cross > n_cross + neigh_tup[2]:
+            v = neigh_tup[0]
+            if v in G.v1():
+                G.pi_1 = G.move_v1(v, G.pi_1[v] + neigh_tup[1])
+            else:
+                G.pi_2 = G.move_v2(v, G.pi_2[v] + neigh_tup[1])
             G_pi_1_min = G.pi_1
             G_pi_2_min = G.pi_2
+            min_cross = n_cross + neigh_tup[2]
+            n_cross = min_cross
+            break
         
-        i = i + 1        
-        neigh_list = [v for v in V if (i - tabu_dict[v]) > ternure ]
-        neigh_set = list(_make_neighborhood(G, neigh_list))
-        
-        
-    G.pi_1 = G_pi_1_min
-    G.pi_2 = G_pi_2_min
-    n_cross = min_cross
-    return min_cross
+        k+=1
+        neigh_list = _eval_neighborhood(G, neigh_list, k)
+    
+    return min_cross, k
 
 def VNS(G, alpha=1.0, k_max=5, verbose=0):
     
@@ -243,13 +298,13 @@ def VNS(G, alpha=1.0, k_max=5, verbose=0):
     n_cross = G.n_cross()
     min_c = n_cross
     
-    it = 0
-    while it < max_it:
-        C = improvement_phase(G, V, len(V))
+    it = 1
+    while it < k_max:
+        C, k_aux = improvement_phase(G, V, 1, k_max, verbose)
         if verbose: 
-            print(it, ":", str(min_c), "::", C)#, ":::", G.n_cross())
+            print(k_aux, ":", str(min_c), "::", C, ":::", G.n_cross())
         if C < min_c:
-            it = 0
+            it = 1
             min_c = C
         else: 
-            it = it + 1
+            it = k_aux

@@ -12,6 +12,7 @@ import networkx as nx
 from python import bgraph
 from python.grasp import grasp as gs
 from python.tabu_search import ts
+from python.vns import VNS
 
 df_results = pd.read_excel("./dbdp_instances/instances.xlsx", sheet_name="instances").replace(regex=".txt", value="")
 
@@ -55,7 +56,15 @@ for i, inst in enumerate(df_results['Instance']):
         fim = time.time()
         t.append(fim - inicio)
 
-    
+    t = []
+    for _ in range(20):
+        TS = New.copy()
+        inicio = time.time()
+        VNS(TS, alpha=1.0, verbose=0, k_max=5)
+        print(TS.n_cross())
+        fim = time.time()
+        t.append(fim - inicio)
+
 
     
     r2 = []
