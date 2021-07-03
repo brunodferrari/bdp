@@ -41,16 +41,20 @@ for i, inst in enumerate(df_results['Instance']):
     
     import time
     inicio = time.time()
+    %%snakeviz
     GS = New.copy()
+    %%snakeviz
     gs(GS, 0.9, 0) 
     fim = time.time()
     (fim - inicio)
     
     %%snakeviz
-    t = []
-    for _ in range(50):
+    #t = []
+    #for _ in range(50):
+        %%snakeviz
         TS = New.copy()
         inicio = time.time()
+        %%snakeviz
         ts(TS, verbose=0, max_it=5)
         print(TS.n_cross())
         fim = time.time()
@@ -100,3 +104,35 @@ matrix de adjacencia gerada da seguinte maneira: coluna 1 do dados o vertice ini
 '''
 
 
+'''
+
+'''
+idx=np.argsort(list(cplex.pi_1.keys()))
+x=np.tri(len(cplex.pi_1)).T 
+np.fill_diagonal(x,0)
+idx=np.argsort(list(cplex.pi_1.keys()))
+x = x[idx,:][:,idx]
+
+idx=np.argsort(list(cplex.pi_2.keys()))
+y=np.tri(len(cplex.pi_2)).T 
+np.fill_diagonal(y,0)
+idx=np.argsort(list(cplex.pi_2.keys()))
+y = y[idx,:][:,idx]
+
+madj = np.zeros((cplex.n_v(),cplex.n_v()))
+for a in cplex.edges():
+    #print(a[0],a[1])
+    madj[a[0],a[1]-min(cplex.v2()) + max(cplex.v1()) + 1]=1
+    madj[a[1]-min(cplex.v2()) + max(cplex.v1()) + 1,a[0]]=1
+    
+text_file = open("sample1.txt", "w")
+n = text_file.write(str(madj.astype(int).tolist()))
+text_file.close()
+
+text_file = open("x.txt", "w")
+n = text_file.write(str(x.astype(int).tolist()))
+text_file.close()
+
+text_file = open("y.txt", "w")
+n = text_file.write(str(y.astype(int).tolist()))
+text_file.close()

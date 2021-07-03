@@ -9,7 +9,7 @@ import copy
 from numba import njit
 from numba.typed import Dict, List
 from numba.core import types
-
+np.seterr(over='ignore')
 def pi(setlist, i):
         try:
             return np.int(np.where(np.array(setlist) == i )[0])

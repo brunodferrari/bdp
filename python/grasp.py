@@ -27,7 +27,7 @@ import numpy as np
 import networkx as nx
 
 #from python 
-import bgraph
+#import bgraph
 
 from datetime import datetime
 inicio = datetime.now()
@@ -223,8 +223,7 @@ def grasp(G, alpha=1.0, verbose=0):
         
         min_cross_ant = min_cross
         min_cross = G.n_cross()
-    
-    print('te1dasdste')    
+        
     #G.order_v1()
     #G.order_v2()
         

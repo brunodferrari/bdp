@@ -16,7 +16,7 @@ import networkx as nx
 from heapq import nlargest as maxq
 #import heapq as max_q
 
-from python import bgraph
+#from python import bgraph
 
 from datetime import datetime
 inicio = datetime.now()

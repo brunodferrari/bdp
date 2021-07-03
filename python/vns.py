@@ -13,7 +13,7 @@ import networkx as nx
 from heapq import nlargest as maxq
 #import heapq as max_q
 
-from python import bgraph
+#from python import bgraph
 
 from datetime import datetime
 inicio = datetime.now()
@@ -282,7 +282,8 @@ def improvement_phase(G, V, k, k_max, verbose=0):
         
         k+=1
         neigh_list = _eval_neighborhood(G, neigh_list, k)
-    
+    if not(neigh_list) and k<k_max: 
+        k = k_max
     return min_cross, k
 
 def VNS(G, alpha=1.0, k_max=5, verbose=0):
