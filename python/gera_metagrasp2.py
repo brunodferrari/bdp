@@ -12,7 +12,7 @@ import time
 import pandas as pd
 import numpy as np
 
-from vns import VNS as vn
+from grasp2 import grasp as gs
 from concurrent.futures import ThreadPoolExecutor
 
 # inicio = datetime.now()
@@ -38,18 +38,18 @@ df_results = df_results.set_index('Instance')
 df_results['Crossing'] = np.nan
 df_results['Time'] = np.nan
 
-VNS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=df_results.index[0]))
-vn(VNS, verbose=0, k_max=5)
+GS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=df_results.index[0]))
+gs(GS, 0.9, max_it=5, verbose=0)
   
-for i, inst in enumerate(df_results.index[174:]):
-    VNS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=inst))
+for i, inst in enumerate(df_results.index[0:]):
+    GS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=inst))
     inicio = time.time()
-    vn(VNS, verbose=0, k_max=5)
+    gs(GS, alpha=0.9, max_it=5, verbose=0)
     fim = time.time()
     
-    df_results.loc[inst, 'Crossing'] = VNS.n_cross()
-    df_results.loc[inst, 'Time'] = (fim - inicio)
+    df_results.loc[inst, 'Crossing'] = GS.n_cross()
+    df_results.loc[inst, 'Time']  = (fim - inicio)
     print(i)
     if not(i % 5):
-        with pd.ExcelWriter(_path+"bdp/dbdp_instances/meta_vns_6.xlsx") as writer:
+        with pd.ExcelWriter(_path+"bdp/dbdp_instances/meta_grasp2_2.xlsx") as writer:
             df_results.dropna().reset_index().to_excel(writer, sheet_name="results", index=False)

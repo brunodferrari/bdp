@@ -30,14 +30,15 @@ def carrega_grafo(path):
     
     return G
 
-df_results = pd.concat([#pd.read_excel(_path+"bdp/dbdp_instances/metafeat.xlsx", sheet_name="results"),
-                        pd.read_excel(_path+"bdp/dbdp_instances/metafeat2.xlsx", sheet_name="results"),
-                        pd.read_excel(_path+"bdp/dbdp_instances/metafeat3.xlsx", sheet_name="results")], axis=0).reset_index(drop=True)
+df_results = pd.concat([pd.read_excel(_path+"bdp/dbdp_instances/metafeat.xlsx", sheet_name="results"),
+                        #pd.read_excel(_path+"bdp/dbdp_instances/metafeat2.xlsx", sheet_name="results"),
+                        #pd.read_excel(_path+"bdp/dbdp_instances/metafeat3.xlsx", sheet_name="results")
+                        ], axis=0).reset_index(drop=True)
 df_results = df_results.set_index('Instance')
 df_results['Crossing'] = np.nan
 df_results['Time'] = np.nan
 
-GS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=df_results.index[52]))
+GS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=df_results.index[0]))
 gs(GS, alpha=0.9)
   
 for i, inst in enumerate(df_results.index[0:]):
@@ -50,5 +51,5 @@ for i, inst in enumerate(df_results.index[0:]):
     df_results.loc[inst, 'Time']  = (fim - inicio)
     print(i)
     if not(i % 5):
-        with pd.ExcelWriter(_path+"bdp/dbdp_instances/meta_grasp_2.xlsx") as writer:
+        with pd.ExcelWriter(_path+"bdp/dbdp_instances/meta_grasp_1_new_cross.xlsx") as writer:
             df_results.dropna().reset_index().to_excel(writer, sheet_name="results", index=False)

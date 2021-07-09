@@ -68,8 +68,20 @@ for i, inst in enumerate(df_results['Instance']):
         print(TS.n_cross())
         fim = time.time()
         t.append(fim - inicio)
-
-
+    
+    param_grid = list(product(np.arange(6,10,1)/10, [5,10,15,20]))
+    res_dict = {}
+    for i, param in enumerate(param_grid):
+        c = []
+        t = []
+        for _ in range(10):
+            inicio = time.time()
+            gs(GS, param[0], max_it=param[1], verbose=0)
+            fim = time.time()
+            t.append(fim - inicio)    
+            c.append(GS.n_cross())
+        print(i)
+        res_dict[i] = (c,t)
     
     r2 = []
     while New.n_cross() >= 42:

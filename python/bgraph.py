@@ -9,6 +9,9 @@ import copy
 from numba import njit
 from numba.typed import Dict, List
 from numba.core import types
+
+from concurrent.futures import ThreadPoolExecutor
+
 np.seterr(over='ignore')
 def pi(setlist, i):
         try:
@@ -17,7 +20,7 @@ def pi(setlist, i):
             print(setlist, i)
         except TypeError:
             return -1    
-        
+
 def crossing(G):
     aux = G.edges().copy()
     c = 0
@@ -35,7 +38,74 @@ def crossing(G):
                 c = c + 1
     return c
 
+def _cross_n(G, e1, e2):
+    i = e1[0]
+    k = e1[1]
+    j = e2[0]
+    l = e2[1]
+    if (G.pi_1[i] < G.pi_1[j]) and (G.pi_2[k] > G.pi_2[l]) and (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
+        return 1
+    elif (G.pi_1[i] > G.pi_1[j]) and (G.pi_2[k] < G.pi_2[l]) and (G.pi_1[i] * G.pi_1[j] * G.pi_2[k] * G.pi_2[l]):
+        return 1
+    
+    return 0
 
+def _cross_w(G, edgeslist):
+    e1 = edgeslist[0]
+    #with ThreadPoolExecutor(6) as ex:
+    output = list(map(lambda x: _cross_n(G, e1, x), edgeslist[1:]))
+    
+    #output=0
+    #for e2 in edgeslist[1:]:
+    #    output = output + _cross_n(G, e1, e2)
+    
+    return sum(output)
+    
+def crossing2(G):
+    edgeslist = G.edges()
+    c = 0
+    with ThreadPoolExecutor(6) as ex:
+        output = list(ex.map(lambda x: _cross_w(G, x), [edgeslist[i:] for i in range(len(edgeslist))]))
+        
+    return c + int(sum(output))
+
+@njit
+def _numba_cross(pi_1, pi_2, edgeslist):
+    c = 0
+    for s, e1 in enumerate(edgeslist):
+        i = e1[0]
+        k = e1[1]
+        for e2 in edgeslist[s+1:]:
+            j = e2[0]
+            l = e2[1]
+        
+            if (pi_1[i] < pi_1[j]) and (pi_2[k] > pi_2[l]) and (pi_1[i] * pi_1[j] * pi_2[k] * pi_2[l]):
+                c = c + 1
+            elif (pi_1[i] > pi_1[j]) and (pi_2[k] < pi_2[l]) and (pi_1[i] * pi_1[j] * pi_2[k] * pi_2[l]):
+                c = c + 1
+        
+    return c
+
+def crossing3(G):
+    edgeslist = G.edges()
+    c = 0
+    
+    pi_1 = Dict.empty(
+        key_type=types.int64,
+        value_type=types.int64,
+                    )
+    pi_2 = Dict.empty(
+        key_type=types.int64,
+        value_type=types.int64,
+                    )
+    pi_1.update(G.pi_1)
+    pi_2.update(G.pi_2)
+    
+    output = _numba_cross(pi_1, pi_2, List(edgeslist))
+    
+    return c + output  
+    
+    
 def bdp_lyt(G, size = 4/3, height = 100): ## Formata lyt adequado para o plot do grafo
     
     import numpy as np
@@ -242,7 +312,7 @@ class BGraph:
         return len(self._set_edges) / (len(self._set_v1)*len(self._set_v2))
         
     def n_cross(self):
-        return crossing(self)
+        return crossing3(self)
     
     def bc(self, v, k):
         return bary(self, v, k)
