@@ -69,7 +69,7 @@ def gera_features(output):
                np.std(_aux_deg),                #std deg
                np.median(_aux_deg),             #median deg                  
                o.density(),                     #graph density
-               o.n_v1(), o.n_v2(), np.min(_aux_deg)) #aux feat
+               o.n_v1(  ), o.n_v2(), np.min(_aux_deg)) #aux feat
 
 
 df_results = pd.read_excel(_path+"bdp/dbdp_instances/stallman_reduced.xlsx", sheet_name="Sheet1")
