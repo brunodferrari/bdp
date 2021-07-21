@@ -12,6 +12,7 @@ import time
 import pandas as pd
 import numpy as np
 
+from time_func import timeout
 from tabu_search import ts
 from concurrent.futures import ThreadPoolExecutor
 
@@ -31,8 +32,8 @@ def carrega_grafo(path):
     return G
 
 df_results = pd.concat([pd.read_excel(_path+"bdp/dbdp_instances/metafeat.xlsx", sheet_name="results"),
-                        #pd.read_excel(_path+"bdp/dbdp_instances/metafeat2.xlsx", sheet_name="results"),
-                        #pd.read_excel(_path+"bdp/dbdp_instances/metafeat3.xlsx", sheet_name="results")
+                        pd.read_excel(_path+"bdp/dbdp_instances/metafeat2.xlsx", sheet_name="results"),
+                        pd.read_excel(_path+"bdp/dbdp_instances/metafeat3.xlsx", sheet_name="results")
                         ], axis=0).reset_index(drop=True)
 df_results = df_results.set_index('Instance')
 df_results['Crossing'] = np.nan
@@ -41,15 +42,20 @@ df_results['Time'] = np.nan
 TS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=df_results.index[1]))
 ts(TS, verbose=0, max_it=5)
   
-for i, inst in enumerate(df_results.index[162:]):
+for i, inst in enumerate(df_results.index[876:],876):
     TS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=inst))
-    inicio = time.time()
-    ts(TS, verbose=0, max_it=5)
+    
+    with timeout(60):        
+        try:
+            inicio = time.time()
+            ts(TS, verbose=0, max_it=5)
+        except:
+            pass
     fim = time.time()
     
     df_results.loc[inst, 'Crossing'] = TS.n_cross()
     df_results.loc[inst, 'Time'] = (fim - inicio)
     print(i)
     if not(i % 5):
-        with pd.ExcelWriter(_path+"bdp/dbdp_instances/meta_tabu_3.xlsx") as writer:
+        with pd.ExcelWriter(_path+"bdp/dbdp_instances/time_constraints_tests/meta_tabu_1.xlsx") as writer:
             df_results.dropna().reset_index().to_excel(writer, sheet_name="results", index=False)

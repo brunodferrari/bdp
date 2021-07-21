@@ -50,7 +50,7 @@ df_final = df_results.join([df_vns[['Crossing', 'Time']].add_suffix('_vns'),
                  df_gs[['Crossing', 'Time']].add_suffix('_gs'), 
                  df_gs_vns[['Crossing', 'Time']].add_suffix('_gs_vns')])
 
-
+df_final = df_final.dropna(thresh=12,axis=0)
 df_final.columns = ['V', 
                     'E',
                     'V_diff',

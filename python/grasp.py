@@ -127,13 +127,13 @@ def improvement_phase(G, U_1, U_2, V, verbose=0):
     Pr_dict = dict(zip(G.degree().keys(),  Pr_list) ) #vetor de probabilidades
     
     while len(U_1 + U_2) > 0:
-    
+        
         v = random.choices(list(Pr_dict.keys()),weights=list(Pr_dict.values()))[0]
         Pr_dict.pop(v)
         cross_i = G.n_cross()
         
-        if verbose: 
-            print("move v: ", v, " n_cross: ", cross_i)
+        #if verbose: 
+            #print("move v: ", v, " n_cross: ", cross_i)
         
         try:
             U_1.remove(v)
@@ -199,34 +199,62 @@ def improvement_phase(G, U_1, U_2, V, verbose=0):
             
             G.pi_2 = min( [(c_ncross, pi_c), (f_ncross, pi_f), \
                              (f_1_ncross, pi_f_1), (c_1_ncross, pi_c_1), (cross_i, pi_aux)], key=lambda x: x[0] )[1]
-    
-def grasp(G, alpha=1.0, verbose=0):
-    
-    U_1 = G.v1().copy()
-    U_2 = G.v2().copy()
-    V = U_1 + U_2
-    
-    construction_phase(G, U_1, U_2, V, alpha)
-    #G.order_v1()
-    #G.order_v2()
 
-    min_cross_ant = G.n_cross()
-    min_cross = min_cross_ant - 1
-    while min_cross < min_cross_ant:
+def grasp(G, alpha=1.0, max_it=5, verbose=0):
     
+    V = G.v1() + G.v2()
+    min_c = np.inf
+    it = 1
+    while it < max_it:
+        
         U_1 = G.v1().copy()
-        U_2 = G.v2().copy()   
-        
+        U_2 = G.v2().copy()
+        construction_phase(G, U_1, U_2, V, alpha)
+        G.order_v1()
+        G.order_v2()
+        U_1 = G.v1().copy()
+        U_2 = G.v2().copy()
         improvement_phase(G, U_1, U_2, V, verbose)
-     #   G.order_v1()
-      #  G.order_v2()
+        C = G.n_cross()
+        if verbose: 
+            print(it, ":", str(min_c), "::", C, ":::", G.n_cross())
         
-        min_cross_ant = min_cross
-        min_cross = G.n_cross()
+        if C < min_c:
+            G_min = G.copy()
+            min_c = C
+        else:
+            it+=1
+    
+    G.pi_1 = G_min.pi_1
+    G.pi_2 = G_min.pi_2
+###################################    
+# def grasp(G, alpha=1.0, verbose=0):
+    
+#     U_1 = G.v1().copy()
+#     U_2 = G.v2().copy()
+#     V = U_1 + U_2
+    
+#     construction_phase(G, U_1, U_2, V, alpha)
+#     #G.order_v1()
+#     #G.order_v2()
+
+#     min_cross_ant = G.n_cross()
+#     min_cross = min_cross_ant - 1
+#     while min_cross < min_cross_ant:
+    
+#         U_1 = G.v1().copy()
+#         U_2 = G.v2().copy()   
         
-    #G.order_v1()
-    #G.order_v2()
+#         improvement_phase(G, U_1, U_2, V, verbose)
+#       #   G.order_v1()
+#       #  G.order_v2()
         
+#         min_cross_ant = min_cross
+#         min_cross = G.n_cross()
+        
+#     #G.order_v1()
+#     #G.order_v2()
+######################################      
 
 if __name__=='__main__':
     #graph_data = pd.read_csv("C:/Users/bferrari/Desktop/pessoal/bdp/dbdp_instances/instances/incgraph_25_25_0.3_0.2_1.txt")

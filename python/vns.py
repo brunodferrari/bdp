@@ -286,6 +286,7 @@ def improvement_phase(G, V, k, k_max, verbose=0):
         k = k_max
     return min_cross, k
 
+
 def VNS(G, alpha=1.0, k_max=5, verbose=0):
     
     U_1 = G.v1().copy()

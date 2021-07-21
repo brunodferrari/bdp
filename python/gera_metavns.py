@@ -12,8 +12,9 @@ import time
 import pandas as pd
 import numpy as np
 
+from time_func import timeout
 from vns import VNS as vn
-from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
 
 # inicio = datetime.now()
 # inicio_time = inicio.strftime("%H:%M:%S")
@@ -31,8 +32,8 @@ def carrega_grafo(path):
     return G
 
 df_results = pd.concat([pd.read_excel(_path+"bdp/dbdp_instances/metafeat.xlsx", sheet_name="results"),
-                        #pd.read_excel(_path+"bdp/dbdp_instances/metafeat2.xlsx", sheet_name="results"),
-                        #pd.read_excel(_path+"bdp/dbdp_instances/metafeat3.xlsx", sheet_name="results")
+                        pd.read_excel(_path+"bdp/dbdp_instances/metafeat2.xlsx", sheet_name="results"),
+                        pd.read_excel(_path+"bdp/dbdp_instances/metafeat3.xlsx", sheet_name="results")
                         ], axis=0).reset_index(drop=True)
 df_results = df_results.set_index('Instance')
 df_results['Crossing'] = np.nan
@@ -41,15 +42,20 @@ df_results['Time'] = np.nan
 VNS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=df_results.index[0]))
 vn(VNS, verbose=0, k_max=5)
   
-for i, inst in enumerate(df_results.index[174:]):
+for i, inst in enumerate(df_results.index[581:], 581):
     VNS = carrega_grafo((_path+'bdp/dbdp_instances/GraphData/{name}.txt').format(name=inst))
-    inicio = time.time()
-    vn(VNS, verbose=0, k_max=5)
+   
+    with timeout(60):        
+        try:
+            inicio = time.time()
+            vn(VNS, alpha=1, verbose=0, k_max=5)
+        except:
+            pass
     fim = time.time()
-    
+       
     df_results.loc[inst, 'Crossing'] = VNS.n_cross()
     df_results.loc[inst, 'Time'] = (fim - inicio)
     print(i)
     if not(i % 5):
-        with pd.ExcelWriter(_path+"bdp/dbdp_instances/meta_vns_6.xlsx") as writer:
+        with pd.ExcelWriter(_path+"bdp/dbdp_instances/time_constraints_tests/meta_vns_1.xlsx") as writer:
             df_results.dropna().reset_index().to_excel(writer, sheet_name="results", index=False)
