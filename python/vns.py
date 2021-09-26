@@ -293,7 +293,7 @@ def VNS(G, alpha=1.0, k_max=5, verbose=0):
     U_2 = G.v2().copy()
     V = U_1 + U_2
     
-    construction_phase(G, U_1, U_2, V, alpha)
+    #construction_phase(G, U_1, U_2, V, alpha)
     G.order_v1()
     G.order_v2()
     global n_cross

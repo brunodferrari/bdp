@@ -185,8 +185,8 @@ def _deg(nodelist, subgraph, edges):
         value_type=types.int64,
                     )
     for v in nodelist:
-            K = [x for x in subgraph if ((v, x) in edges) or ((x, v) in edges)]
-            deg[v] = len(K)
+        K = [x for x in subgraph if ((v, x) in edges) or ((x, v) in edges)]
+        deg[v] = len(K)
     
     return deg
 

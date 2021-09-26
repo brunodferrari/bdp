@@ -43,7 +43,7 @@ best_mh_labeled = best_mh.replace({'Crossing_vns': 1,
 ###################### SVM ##########################
 poly_kernel_svm_clf = Pipeline([ 
         ("scaler", StandardScaler()), 
-        ("model", SVC(probability=True,random_state=42) 
+        ("model", SVC(probability=True,random_state=42)) 
     ]) 
 
 tuned_parameters = [{'model__kernel': ['rbf'], 'model__gamma': [1e4, 1e3, 1e2, 1e1, 1, 1e-3, 1e-4],

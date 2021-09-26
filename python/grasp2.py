@@ -205,7 +205,7 @@ def improvement_phase(G, V, k, k_max, verbose=0):
     return min_cross, k
     
 def grasp(G, alpha=1.0, max_it=5, verbose=0):
-    
+    G_min = G.copy()
     U_1 = G.v1().copy()
     U_2 = G.v2().copy()
     V = U_1 + U_2
@@ -222,6 +222,7 @@ def grasp(G, alpha=1.0, max_it=5, verbose=0):
         G.order_v1()
         G.order_v2()
         n_cross = G.n_cross()
+        #print('aqui')
         C, k_aux = improvement_phase(G, V, 1, 5, verbose)
         
         if verbose: 

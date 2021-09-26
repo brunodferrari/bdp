@@ -3,6 +3,8 @@
 Created on Sat Aug  7 13:38:07 2021
 
 @author: bferrari
+
+Teste 1 
 """
 
 import pandas as pd
@@ -52,17 +54,17 @@ tuned_parameters = [{'model__kernel': ['rbf'], 'model__gamma': [1e4, 1e3, 1e2, 1
 
 svc_grid = GridSearchCV(poly_kernel_svm_clf, tuned_parameters, n_jobs=5, verbose=1)
 
-best_svm = svc_grid.fit(X, best_mh_labeled)
+#best_svm = svc_grid.fit(X, best_mh_labeled)
 
-acc_svm = cross_val_score(best_svm.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
+acc_svm = cross_val_score(svc_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
 print('Accuracy')
 print(round(acc_svm.mean(), 2))
 print(round(acc_svm.std(), 2))
-roc_svm = cross_val_score(best_svm.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
+roc_svm = cross_val_score(svc_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
 print('ROC')
 print(round(roc_svm.mean(), 2))
 print(round(roc_svm.std(), 2))
-svm_hat = cross_val_predict(best_svm.best_estimator_, X, best_mh_labeled, n_jobs=-1, verbose=1)
+svm_hat = cross_val_predict(svc_grid, X, best_mh_labeled, n_jobs=-1, verbose=1)
 
 ###################### AD ##########################
 Xtr, Xval, Ytr, Yval = train_test_split(X, best_mh_labeled)
@@ -83,16 +85,16 @@ plot_tree(ad.named_steps['model'], feature_names=X.columns)
 
 
 ad_grid = GridSearchCV(ad, tuned_parameters, n_jobs=5, verbose=1)
-best_ad = ad_grid.fit(X, best_mh_labeled)
-acc_ad = cross_val_score(best_ad.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
+#best_ad = ad_grid.fit(X, best_mh_labeled)
+acc_ad = cross_val_score(ad_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
 print('Accuracy')
 print(round(acc_ad.mean(), 2))
 print(round(acc_ad.std(), 2))
 print('ROC')
-roc_ad = cross_val_score(best_ad.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
+roc_ad = cross_val_score(ad_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
 print(round(roc_ad.mean(), 2))
 print(round(roc_ad.std(), 2))
-ad_hat = cross_val_predict(best_ad.best_estimator_, X, best_mh_labeled, n_jobs=-1, verbose=1)
+ad_hat = cross_val_predict(ad_grid, X, best_mh_labeled, n_jobs=-1, verbose=1)
 
 
 ###################### RF ##########################
@@ -112,16 +114,16 @@ print(rf.score(Xval,Yval))
 
 
 rf_grid = GridSearchCV(rf, tuned_parameters, n_jobs=5, verbose=1)
-best_rf = rf_grid.fit(X, best_mh_labeled)
-acc_rf = cross_val_score(best_rf.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
+#best_rf = rf_grid.fit(X, best_mh_labeled)
+acc_rf = cross_val_score(rf_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
 print('Accuracy')
 print(round(acc_rf.mean(), 2))
 print(round(acc_rf.std(), 2))
 print('ROC')
-roc_rf  = cross_val_score(best_rf.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
+roc_rf  = cross_val_score(rf_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
 print(round(roc_rf.mean(), 2))
 print(round(roc_rf.std(), 2))
-rf_hat = cross_val_predict(best_rf.best_estimator_, X, best_mh_labeled, n_jobs=-1, verbose=1)
+rf_hat = cross_val_predict(rf_grid, X, best_mh_labeled, n_jobs=-1, verbose=1)
 
 
 ###################### KNN ##########################
@@ -141,17 +143,17 @@ knn.fit(Xtr,Ytr)
 print(knn.score(Xval,Yval))
 
 knn_grid = GridSearchCV(knn, tuned_parameters, n_jobs=5, verbose=1)
-best_knn = knn_grid.fit(X, best_mh_labeled)
+#best_knn = knn_grid.fit(X, best_mh_labeled)
 
-acc_knn = cross_val_score(best_knn.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
+acc_knn = cross_val_score(knn_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='accuracy')
 print('Accuracy')
 print(round(acc_knn.mean(), 2))
 print(round(acc_knn.std(), 2))
 print('ROC')
-roc_knn  = cross_val_score(best_knn.best_estimator_, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
+roc_knn  = cross_val_score(knn_grid, X, best_mh_labeled, n_jobs=5, verbose=1, scoring='roc_auc_ovr')
 print(round(roc_knn.mean(), 2))
 print(round(roc_knn.std(), 2))
-knn_hat = cross_val_predict(best_knn.best_estimator_, X, best_mh_labeled, n_jobs=-1, verbose=1)
+knn_hat = cross_val_predict(knn_grid, X, best_mh_labeled, n_jobs=-1, verbose=1)
 
 ###################### CM ##########################
 #fig, ax = plt.subplots(2, 2, figsize=(12,12))

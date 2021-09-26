@@ -10,7 +10,7 @@ import numpy as np
 import networkx as nx
 
 from python import bgraph
-from python.grasp import grasp as gs
+from python.grasp2 import grasp as gs
 from python.tabu_search import ts
 from python.vns import VNS
 
@@ -44,7 +44,7 @@ for i, inst in enumerate(df_results['Instance']):
     %%snakeviz
     GS = New.copy()
     %%snakeviz
-    gs(GS, 0.9, 0) 
+    gs(GS, 0, 10, 1) 
     fim = time.time()
     (fim - inicio)
     

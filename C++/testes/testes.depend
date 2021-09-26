@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1632694494 source:c:\bdp\testes\testes\main.cpp
+	<iostream>
+	<stdlib.h>
+	<bits/stdc++.h>
+	<vector>
+	<unordered_map>
+	<unordered_set>
+	<map>
+
+1632696471 source:c:\bdp\bdp\c++\testes\main.cpp
+	<iostream>
+	<stdlib.h>
+	<bits/stdc++.h>
+	<vector>
+	<unordered_map>
+	<unordered_set>
+	<map>
+

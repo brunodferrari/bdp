@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1630378350 source:c:\users\bruno ferrari\documents\bruno\2019\2s\mc\artigos revisão\artigos mes\gd\bdp\c++\bgraph\grasp.cpp
+
+1631643313 source:c:\users\bruno ferrari\documents\bruno\2019\2s\mc\artigos revisão\artigos mes\gd\bdp\c++\bgraph\main.cpp
+	<iostream>
+	<limits>
+	"bgraph.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1631643250 source:c:\users\bruno ferrari\documents\bruno\2019\2s\mc\artigos revisão\artigos mes\gd\bdp\c++\bgraph\bgraph.cpp
+	<iostream>
+	<limits>
+	<vector>
+	"bgraph.h"
+
+1631643251 c:\users\bruno ferrari\documents\bruno\2019\2s\mc\artigos revisão\artigos mes\gd\bdp\c++\bgraph\bgraph.h
+

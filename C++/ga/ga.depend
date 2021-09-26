@@ -1,0 +1,21 @@
+# depslib dependency file v1.0
+1630682869 source:c:\bdp\ga\main.cpp
+	<iostream>
+	<memory>
+	<process.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1630595454 source:c:\bdp\ga\bgcmp_sa_vns.cpp
+	<memory>
+	<process.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<math.h>
+	"bgcmp_sa_vns.h"
+
+1489283032 c:\bdp\ga\bgcmp_sa_vns.h
+	<stdio.h>
+
