@@ -8,7 +8,7 @@
 	<unordered_set>
 	<map>
 
-1632696471 source:c:\bdp\bdp\c++\testes\main.cpp
+1633535541 source:c:\bdp\bdp\c++\testes\main.cpp
 	<iostream>
 	<stdlib.h>
 	<bits/stdc++.h>
@@ -16,4 +16,5 @@
 	<unordered_map>
 	<unordered_set>
 	<map>
+	<random>
 

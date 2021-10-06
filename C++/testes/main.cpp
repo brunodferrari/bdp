@@ -8,6 +8,8 @@
 #include <unordered_set>
 #include <map>
 
+#include <random>
+
 #define print(txt) cout << txt << endl;
 using namespace std;
 
@@ -555,6 +557,67 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
     }
 }
 
+int random_choice(BGraph& G, unordered_map<int,int> Degrees){
+
+    vector<int> vector_list;
+    vector<double> pr_list;
+
+    unordered_set<int> sample;
+
+    for(auto i = Degrees.begin(); i != Degrees.end() ; i++ ){
+
+        cout << i->first << "(" << i->second << ") * ";
+
+        vector_list.push_back(i->first);
+        pr_list.push_back(i->second);
+
+    }
+
+    cout << endl;
+
+    random_device rd;
+    mt19937 gen(rd());
+
+    discrete_distribution<int> dist(pr_list.begin(),pr_list.end());
+
+    vector<double> prob;
+
+    int v;
+    int s;
+    int i=0;
+    while( sample.size() < vector_list.size() ){
+        //dist = discrete_distribution<int>(pr_list.begin(),pr_list.end());
+
+        /*
+        cout << '\n';
+        prob = dist.probabilities();
+        for(auto n : prob)
+            cout << n << ' ';
+        cout << '\n';*/
+
+        s = dist(gen);
+        pr_list[s] = 0;
+
+        v = vector_list[s];
+        auto p = sample.insert(v);
+
+        if( p.second ){
+            cout //<< "(" << s << ")"
+            << v << " / ";
+        }
+        i++;
+    }
+    cout << endl;
+    cout << i ;
+
+    return 0;
+    //while(Degrees.size()){
+    //}
+
+}
+
+
+
 
 int main()
 {
@@ -639,7 +702,23 @@ int main()
     }*/
 
 
+
+
+
+    time_t t_start, t_end;
+
+
     aux = New.degrees();
+
+    time(&t_start);
+    random_choice(New, aux);
+    time(&t_end);
+
+    print("time")
+    double time_taken = double(t_end - t_start);
+    cout << "Time taken by program is : " << fixed
+         << time_taken << setprecision(10);
+    cout << " sec " << endl;
 
     auto cmp = [](pair<int,int> left, pair<int,int> right) { return left.second < right.second; };
 
