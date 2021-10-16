@@ -191,7 +191,7 @@ class BGraph{
                 this->layer[v1_[i-1].get_vertex()] = 1;
             }
             for (i=1;i<=n_v2_;i++){
-                this->map_v2[i] = v2_[i-1];
+                this->map_v2[v2_[i-1].get_pos()] = v2_[i-1];
                 this->pi_2[v2_[i-1].get_vertex()] = v2_[i-1];
                 this->layer[v2_[i-1].get_vertex()] = 2;
             }
