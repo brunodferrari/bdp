@@ -185,7 +185,8 @@ class BGraph{
 
 
             for (i=1;i<=n_v1_;i++){
-                this->map_v1[i] = v1_[i-1];
+                this->map_v1[v1_[i-1].get_pos()] = v1_[i-1];
+                cout << i << "(" << v1_[i-1].get_vertex() << ")" << " ~ ";
                 this->pi_1[v1_[i-1].get_vertex()] = v1_[i-1];
                 this->layer[v1_[i-1].get_vertex()] = 1;
             }
@@ -330,6 +331,45 @@ class BGraph{
             }
             return c;
         }
+
+
+        void move_vertex(int v, int to){
+
+            int k;
+            int from;
+
+            VSorted *pos_assing;
+            Dict *pi;
+
+            k = this->layer[v];
+
+            switch(k){
+                case 1:
+                    from = this->pi_1[v].get_pos();
+                    pos_assing = &this->map_v1;
+                    pi = &this->pi_1;
+                break;
+
+                case 2:
+                    from = this->pi_2[v].get_pos();
+                    pos_assing = &this->map_v2;
+                    pi = &this->pi_2;
+                break;
+            }
+
+            int pos, u, c;
+
+            c = to < from ? -1 : 1;
+
+            for (pos = from; pos != to; pos += c){
+                u = (*pos_assing)[pos + c].get_vertex();
+                (*pi)[u].setPos(pos);
+                (*pos_assing)[pos] = (*pi)[u];
+            }
+            (*pi)[v].setPos(to);
+            (*pos_assing)[to] = (*pi)[v];
+        }
+
 
         void printBGraph(){
             char u;
@@ -557,7 +597,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
     }
 }
 
-int random_choice(BGraph& G, unordered_map<int,int> Degrees){
+unordered_set<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = -1){
 
     vector<int> vector_list;
     vector<double> pr_list;
@@ -575,8 +615,10 @@ int random_choice(BGraph& G, unordered_map<int,int> Degrees){
 
     cout << endl;
 
-    random_device rd;
-    mt19937 gen(rd());
+    //random_device rd;
+
+
+    mt19937 gen(seed);
 
     discrete_distribution<int> dist(pr_list.begin(),pr_list.end());
 
@@ -610,7 +652,7 @@ int random_choice(BGraph& G, unordered_map<int,int> Degrees){
     cout << endl;
     cout << i ;
 
-    return 0;
+    return sample;
     //while(Degrees.size()){
     //}
 
@@ -691,7 +733,39 @@ int main()
 
     print(New.greedy_selection(1,V,V_sub));
 
+    print("################");
+    print("MOVE");
+
     New.printBGraph();
+
+    New.move_vertex(2,2);
+    New.printBGraph();
+    print("Crossing " << New.n_cross());
+
+    New.move_vertex(3,4);
+    New.printBGraph();
+    print("Crossing " << New.n_cross());
+
+    New.move_vertex(6,4);
+    New.printBGraph();
+    print("Crossing " << New.n_cross());
+
+    New.move_vertex(3,5);
+    New.printBGraph();
+
+    New.move_vertex(3,1);
+    New.printBGraph();
+
+    New.move_vertex(3,2);
+    New.printBGraph();
+
+    New.move_vertex(3,3);
+    New.printBGraph();
+    print("Crossing " << New.n_cross());
+
+
+
+
     construction_phase(New, U_1, U_2, 1);
     New.printBGraph();
 /*
@@ -711,7 +785,7 @@ int main()
     aux = New.degrees();
 
     time(&t_start);
-    random_choice(New, aux);
+    random_choice(New, aux, 42);
     time(&t_end);
 
     print("time")
