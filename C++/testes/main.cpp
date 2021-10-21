@@ -370,6 +370,59 @@ class BGraph{
             (*pos_assing)[to] = (*pi)[v];
         }
 
+        Dict move_vertex(int v, int to, int inplace){
+            int k;
+            int from;
+
+            VSorted pos_assing;
+            Dict pi;
+
+            k = this->layer[v];
+
+            switch(k){
+                case 1:
+                    from = this->pi_1[v].get_pos();
+                    pos_assing = this->map_v1;
+                    pi = this->pi_1;
+                break;
+
+                case 2:
+                    from = this->pi_2[v].get_pos();
+                    pos_assing = this->map_v2;
+                    pi = this->pi_2;
+                break;
+            }
+
+            int pos, u, c;
+
+            c = to < from ? -1 : 1;
+
+            for (pos = from; pos != to; pos += c){
+                u = (pos_assing)[pos + c].get_vertex();
+                //(pi)[u].setPos(pos);
+                pi[u] = *(new Vertex(u, pos));
+                (pos_assing)[pos] = (pi)[u];
+            }
+            //(pi)[v].setPos(to);
+            pi[v] = *(new Vertex(v, to));
+            (pos_assing)[to] = (pi)[v];
+
+            if (inplace) {
+                switch(k){
+                    case 1:
+                        this->map_v1 = pos_assing;
+                        this->pi_1 = pi;
+                    break;
+
+                    case 2:
+                        this->map_v2 = pos_assing;
+                        this->pi_2 = pi;
+                    break;
+                }
+            }
+            return pi;
+        }
+
 
         void printBGraph(){
             char u;
@@ -438,7 +491,7 @@ class BGraph{
 //template<typename T>
 
 
-void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_2, float alpha ){
+void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_2, float alpha, int seed=-1){
 
     int v, k;
 
@@ -597,12 +650,15 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
     }
 }
 
-unordered_set<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = -1){
+vector<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = -1){
 
     vector<int> vector_list;
     vector<double> pr_list;
+    vector<int> sample;
 
-    unordered_set<int> sample;
+    unordered_set<int> restrict_set;
+
+
 
     for(auto i = Degrees.begin(); i != Degrees.end() ; i++ ){
 
@@ -641,11 +697,12 @@ unordered_set<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int 
         pr_list[s] = 0;
 
         v = vector_list[s];
-        auto p = sample.insert(v);
+        auto p = restrict_set.insert(v);
 
         if( p.second ){
             cout //<< "(" << s << ")"
             << v << " / ";
+            sample.push_back(v);
         }
         i++;
     }
@@ -659,7 +716,60 @@ unordered_set<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int 
 }
 
 
+void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unordered_set<int>() , unordered_set<int> U_2 =  unordered_set<int>()){
 
+
+    unordered_map<int,int> deg;
+
+    unordered_set<int> U;
+
+    vector<int> sample;
+
+    if (U_1.size() * U_2.size()){
+        for (auto i = U_2.begin(); i != U_2.end(); i++){
+            U.insert(*i);
+        }
+        for (auto i = U_1.begin(); i != U_1.end(); i++){
+            U.insert(*i);
+        }
+        deg = G.degrees(U, U);
+    } else {
+        deg = G.degrees();
+    }
+
+    int k,v;
+
+    Dict pi_aux;
+    Dict pi_plus;
+    Dict pi_minus;
+    Dict pi_bc;
+
+
+    sample = random_choice(G, deg, seed);
+    print("")
+    print("############SAMPLE CHECK################");
+    for (auto i = sample.begin(); i != sample.end(); i++){
+        print(*i);
+
+        v = *i;
+
+        k = G.layer[v];
+
+        switch(k){
+            case 1:
+                pi_aux = G.pi_1;
+            break;
+
+            case 2:
+                pi_aux = G.pi_2;
+            break;
+        }
+
+
+
+
+    }
+}
 
 int main()
 {
@@ -737,33 +847,32 @@ int main()
     print("MOVE");
 
     New.printBGraph();
+    print("Crossing " << New.n_cross());
 
-    New.move_vertex(2,2);
+    New.move_vertex(2,2,1);
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(3,4);
+    New.move_vertex(3,4,1);
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(6,4);
+    New.move_vertex(6,4,1);
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(3,5);
+    New.move_vertex(3,5,1);
     New.printBGraph();
 
-    New.move_vertex(3,1);
+    New.move_vertex(3,1,1);
     New.printBGraph();
 
-    New.move_vertex(3,2);
+    New.move_vertex(3,2,1);
     New.printBGraph();
 
-    New.move_vertex(3,3);
+    New.move_vertex(3,3,1);
     New.printBGraph();
     print("Crossing " << New.n_cross());
-
-
 
 
     construction_phase(New, U_1, U_2, 1);
@@ -786,6 +895,11 @@ int main()
 
     time(&t_start);
     random_choice(New, aux, 42);
+
+    improvement_phase(New,42);
+
+
+
     time(&t_end);
 
     print("time")
