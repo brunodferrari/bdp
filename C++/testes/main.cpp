@@ -33,9 +33,9 @@ class Vertex{
             (*this->pos) = p;
         }
 
-        ~Vertex(){
-            delete this->pos;
-        }
+        //~Vertex(){
+        //    delete this->pos;
+        //}
 
         void setVertex(int i, int p){
             this->v = i;
@@ -399,12 +399,12 @@ class BGraph{
 
             for (pos = from; pos != to; pos += c){
                 u = (pos_assing)[pos + c].get_vertex();
-                //(pi)[u].setPos(pos);
-                pi[u] = *(new Vertex(u, pos));
+                (pi)[u].setPos(pos);
+                //pi[u] = *(new Vertex(u, pos));
                 (pos_assing)[pos] = (pi)[u];
             }
-            //(pi)[v].setPos(to);
-            pi[v] = *(new Vertex(v, to));
+            (pi)[v].setPos(to);
+            //pi[v] = *(new Vertex(v, to));
             (pos_assing)[to] = (pi)[v];
 
             if (inplace) {
