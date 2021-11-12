@@ -134,6 +134,7 @@ class BGraph{
         Adj *adj_list;
         Adj2 adj_list2;
         unordered_map<int,int> layer;
+        int maped;
 
         BGraph(int n_v1_, int n_v2_, int n_edges_, Vertex *v1_, Vertex *v2_, Edge *e, int shift = 0){
             this->n_v1 = n_v1_;
@@ -195,7 +196,7 @@ class BGraph{
                 this->pi_2[v2_[i-1].get_vertex()] = v2_[i-1];
                 this->layer[v2_[i-1].get_vertex()] = 2;
             }
-
+            this->maped = 0;
         }
 
         unordered_map<int, int> degrees(){
@@ -289,7 +290,6 @@ class BGraph{
             }
             b/= K > 0 ? K : 1;
 
-            print(this->pi_2[6].get_pos());
             return b;
         }
 
@@ -419,12 +419,38 @@ class BGraph{
                         this->pi_2 = pi;
                     break;
                 }
+            } else {
+                this->maped = k;
             }
             return pi;
         }
 
+        void re_map(int k){
+
+            VSorted *pos_assing;
+            Dict *pi;
+
+            switch(k){
+                case 1:
+                    pos_assing = &this->map_v1;
+                    pi = &this->pi_1;
+                break;
+
+                case 2:
+                    pos_assing = &this->map_v2;
+                    pi = &this->pi_2;
+                break;
+            }
+
+            for(auto i = (*pi).begin(); i != (*pi).end(); i++){
+                (*pos_assing)[i->second.get_pos()] = i->second;
+            }
+            this->maped = 0;
+        }
 
         void printBGraph(){
+            if (this->maped) { re_map(this->maped); }
+
             char u;
             char v;
             int n_max = (this->n_v1 > this->n_v2 ? this->n_v1 : this->n_v2);
@@ -512,7 +538,8 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
     unordered_set<int> U;
 
     for (auto i = U_2.begin(); i != U_2.end(); i++){
-        cout << *i<<"("<<(*G.pi_2[*i].pos) << ") : " << endl ;
+
+        cout << *i<<"("<<(G.pi_2[*i].get_pos()) << ") : " << endl ;
         U.insert(*i);
 
         pos = G.pi_2[*i].get_pos();
@@ -523,7 +550,9 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
 
 
     for (auto i = U_1.begin(); i != U_1.end(); i++){
-        cout << *i<<"("<<(*G.pi_1[*i].pos) << ") : " << endl ;
+
+        cout << *i<<"("<<(G.pi_1[*i].get_pos()) << ") : " << endl ; //print exclude
+
         U.insert(*i);
 
         pos = G.pi_1[*i].get_pos();
@@ -534,7 +563,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
 
     for (auto i = U.begin(); i != U.end(); i++){
         cout << *i << " : ";
-        G.pi_1.find(*i) == G.pi_1.end() ? cout << (*G.pi_2[*i].pos) << " /" : cout << (*G.pi_1[*i].pos) << " /";
+        G.pi_1.find(*i) == G.pi_1.end() ? cout << (G.pi_2[*i].get_pos()) << " /" : cout << (G.pi_1[*i].get_pos()) << " /";
         cout << endl;
     }
 
@@ -544,13 +573,13 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
     switch(k){
         case 1:
             U_1.erase(v);
-            (*G.pi_1[v].pos) = 1;
+            G.pi_1[v].setPos(1);
             G.map_v1[1] = G.pi_1[v];
         break;
 
         case 2:
             U_2.erase(v);
-            (*G.pi_2[v].pos) = 1;
+            G.pi_2[v].setPos(1);
             G.map_v2[1] = G.pi_2[v];
         break;
     }
@@ -841,7 +870,7 @@ int main()
     print("union")
     srand(1);
 
-    print(New.greedy_selection(1,V,V_sub));
+    print(New.greedy_selection(1, V, V_sub));
 
     print("################");
     print("MOVE");
@@ -849,11 +878,20 @@ int main()
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(2,2,1);
-    New.printBGraph();
+    //auto r_test = New.move_vertex(2,1,0);
+    New.pi_1 = New.move_vertex(2,5,0);;
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(3,4,1);
+    print(New.pi_1[1].get_pos());
+    print(New.pi_1[2].get_pos());
+    print(New.pi_1[3].get_pos());
+    print(New.pi_1[4].get_pos());
+    print(New.pi_1[5].get_pos());
+    New.n_cross();
+    //New.printBGraph();
+    print("Crossing " << New.n_cross());
+
+    //New.move_vertex(3,4,1);
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
