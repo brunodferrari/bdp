@@ -747,6 +747,7 @@ vector<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = 
 
 void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unordered_set<int>() , unordered_set<int> U_2 =  unordered_set<int>()){
 
+    auto isInteger = [](float N){ return (N - (int) N) > 0 ? 0 : 1; };
 
     unordered_map<int,int> deg;
 
@@ -773,6 +774,16 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
     Dict pi_minus;
     Dict pi_bc;
 
+    unsigned int n_cross_aux=-1;
+    unsigned int n_cross_bc=-1;
+    unsigned int n_cross_plus=-1;
+    unsigned int n_cross_minus=-1;
+
+
+    float bc;
+    int v_bc;
+    int v_plus;
+    int v_minus;
 
     sample = random_choice(G, deg, seed);
     print("")
@@ -781,12 +792,27 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
         print(*i);
 
         v = *i;
-
         k = G.layer[v];
+        bc = G.bc(v, k)
 
         switch(k){
             case 1:
                 pi_aux = G.pi_1;
+                n_cross_aux = G.n_cross();
+
+                if ( ((int) bc == 1) ){
+                    v_bc = bc + 1;
+                    v_minus = v_bc - 1;
+                    v_plus =  v_bc + 1 > G.n_v2 ? 0 : v_bc + 1 ;
+                }else if ( (int) bc == G.n_v2 ) {
+                    v_bc = bc;
+                    v_minus = v_bc - 1 > 0 ;
+                    v_plus =  v_bc + 1 > G.n_v2 ? 0 : v_bc + 1 ;
+                }
+                int_bc = int_bc > G.n_v2 - 1
+
+
+
             break;
 
             case 2:
@@ -795,13 +821,12 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
         }
 
 
-
+        G.move_vertex()
 
     }
 }
 
-int main()
-{
+int main(){
 
     Edge e[] = {{1,6}, {2,6}, {3,7}, {3,8}, {4,7}, {5,6}, {5,9}, {2,9},{4,6}};
 
