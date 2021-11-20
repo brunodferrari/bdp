@@ -19,18 +19,20 @@ class Vertex{
         int v;
 
     public:
-        int *pos;
+        int pos;
 
         Vertex(){
             this->v = -1;
-            this->pos = new int;
-            (*this->pos) = 0;
+            //this->pos = new int;
+            //(*this->pos) = 0;
+            this->pos = 0;
         }
 
         Vertex(int i, int p){
             this->v = i;
-            this->pos = new int;
-            (*this->pos) = p;
+            //this->pos = new int;
+            //(*this->pos) = p;
+            this->pos = p;
         }
 
         //~Vertex(){
@@ -39,12 +41,14 @@ class Vertex{
 
         void setVertex(int i, int p){
             this->v = i;
-            this->pos = new int;
-            (*this->pos) = p;
+            //this->pos = new int;
+            //(*this->pos) = p;
+            this->pos = p;
         }
 
         void setPos(int p){
-            (*this->pos) = p;
+            //(*this->pos) = p;
+            this->pos = p;
         }
 
         int get_vertex() const {
@@ -52,7 +56,8 @@ class Vertex{
         }
 
         int get_pos() const {
-            return (*pos);
+            //return (*pos);
+            return pos;
         }
 
 
@@ -361,6 +366,11 @@ class BGraph{
 
             c = to < from ? -1 : 1;
 
+            int i;
+            cin >> i;
+            if (i==1){
+                printBGraph();
+            }
             for (pos = from; pos != to; pos += c){
                 u = (*pos_assing)[pos + c].get_vertex();
                 (*pi)[u].setPos(pos);
@@ -785,6 +795,11 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
     int v_plus;
     int v_minus;
 
+     // MIN HEAP
+    auto cmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
+    priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(cmp)> min_q(cmp);
+
+
     sample = random_choice(G, deg, seed);
     print("")
     print("############SAMPLE CHECK################");
@@ -793,23 +808,29 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
 
         v = *i;
         k = G.layer[v];
-        bc = G.bc(v, k)
+        bc = G.bc(v, k);
 
         switch(k){
             case 1:
-                pi_aux = G.pi_1;
-                n_cross_aux = G.n_cross();
 
-                if ( ((int) bc == 1) ){
+                if (  isInteger(bc)   ){
+                    v_bc = bc;
+                    v_minus = v_bc - 1;
+                    v_plus =  v_bc + 1 > G.n_v2 ? 0 : v_bc + 1 ;
+                } else if ( ((int) bc == 1) ){
                     v_bc = bc + 1;
                     v_minus = v_bc - 1;
                     v_plus =  v_bc + 1 > G.n_v2 ? 0 : v_bc + 1 ;
-                }else if ( (int) bc == G.n_v2 ) {
+                } else if ( (int) bc == G.n_v2 ) {
                     v_bc = bc;
                     v_minus = v_bc - 1 > 0 ;
                     v_plus =  v_bc + 1 > G.n_v2 ? 0 : v_bc + 1 ;
                 }
-                int_bc = int_bc > G.n_v2 - 1
+
+                //int_bc = int_bc > G.n_v2 - 1
+                pi_aux = G.pi_1;
+                n_cross_aux = G.n_cross();
+                min_q.push({pi_aux, n_cross_aux});
 
 
 
@@ -821,7 +842,7 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
         }
 
 
-        G.move_vertex()
+        //G.move_vertex()
 
     }
 }
@@ -900,19 +921,66 @@ int main(){
     print("################");
     print("MOVE");
 
+    auto mcmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
+    priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(mcmp)> min_q(mcmp);
+
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    //auto r_test = New.move_vertex(2,1,0);
-    New.pi_1 = New.move_vertex(2,5,0);;
+    min_q.push({New.pi_1, New.n_cross()});
+
+    Dict r_test = New.move_vertex(2,1,0);
+    New.pi_1 = r_test;
+    New.printBGraph();
     print("Crossing " << New.n_cross());
+
+    min_q.push({r_test, New.n_cross()});
+
+    auto q_test1 = min_q.top();
+    min_q.pop();
+    auto q_test = min_q.top();
+
+    print("mIn q test");
+    print(q_test.second);
+
+    print("mIn q test 2");
+    print(q_test1.second);
+
+    print("Crossing " << New.n_cross());
+
+    New.pi_1 = q_test.first;
+    print("Crossing " << New.n_cross());
+
+    print(q_test.first[1].get_pos());
+    print(q_test.first[2].get_pos());
+    print(q_test.first[3].get_pos());
+    print(q_test.first[4].get_pos());
+    print(q_test.first[5].get_pos());
+    print("xx");
+
+    print(q_test1.first[1].get_pos());
+    print(q_test1.first[2].get_pos());
+    print(q_test1.first[3].get_pos());
+    print(q_test1.first[4].get_pos());
+    print(q_test1.first[5].get_pos());
+
+
+
 
     print(New.pi_1[1].get_pos());
     print(New.pi_1[2].get_pos());
     print(New.pi_1[3].get_pos());
     print(New.pi_1[4].get_pos());
     print(New.pi_1[5].get_pos());
-    New.n_cross();
+    print("Crossing " << New.n_cross());
+    New.printBGraph();
+    print("Crossing " << New.n_cross());
+    New.re_map(1);
+    print("Crossing " << New.n_cross());
+    New.printBGraph();
+    print("Crossing " << New.n_cross());
+
+
     //New.printBGraph();
     print("Crossing " << New.n_cross());
 
@@ -920,20 +988,20 @@ int main(){
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(6,4,1);
+    New.move_vertex(6,4);
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    New.move_vertex(3,5,1);
+    New.move_vertex(3,5);
     New.printBGraph();
 
-    New.move_vertex(3,1,1);
+    New.move_vertex(3,1);
     New.printBGraph();
 
-    New.move_vertex(3,2,1);
+    New.move_vertex(3,2);
     New.printBGraph();
 
-    New.move_vertex(3,3,1);
+    New.move_vertex(3,3);
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
