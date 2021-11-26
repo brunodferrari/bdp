@@ -112,10 +112,15 @@ typedef unordered_map<int, Vertex> Dict;
 typedef map<int, Vertex> VSorted;
 
 
+
 typedef struct Edge{
     int u;
     int v;
 } edge;
+
+auto mcmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
+typedef priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(mcmp)> MinQueue;
+
 
 class BGraph{
     private:
@@ -238,7 +243,7 @@ class BGraph{
                 deg_dict = degrees(V, V_sub);
             }
 
-            cout << " Deg size " << deg_dict.size() << endl ;
+            //cout << " Deg size " << deg_dict.size() << endl ;
 
             //Max Heap
             auto cmp = [](pair<int,int> left, pair<int,int> right) { return left.second < right.second; }; // Funcao de Comparacao
@@ -253,11 +258,11 @@ class BGraph{
 
             while( max_q.top().second >= deg_max && !max_q.empty()){
                 rcl.push_back(max_q.top().first);
-                    cout << max_q.top().first << " ";
+                    cout << "   TOP "<<max_q.top().first << " ";
                 max_idx++;
                 max_q.pop();
             }
-            cout << endl;
+            //cout << endl;
             if (seed!=-1) { srand(seed); }
             int idx = rand() % max_idx;
 
@@ -366,11 +371,11 @@ class BGraph{
 
             c = to < from ? -1 : 1;
 
-            int i;
-            cin >> i;
-            if (i==1){
-                printBGraph();
-            }
+            //int i;
+            //cin >> i;
+            //if (i==1){
+              //  printBGraph();
+            //}
             for (pos = from; pos != to; pos += c){
                 u = (*pos_assing)[pos + c].get_vertex();
                 (*pi)[u].setPos(pos);
@@ -437,8 +442,10 @@ class BGraph{
 
         void re_map(int k){
 
+            VSorted new_assing;
             VSorted *pos_assing;
             Dict *pi;
+
 
             switch(k){
                 case 1:
@@ -453,8 +460,9 @@ class BGraph{
             }
 
             for(auto i = (*pi).begin(); i != (*pi).end(); i++){
-                (*pos_assing)[i->second.get_pos()] = i->second;
+                new_assing[i->second.get_pos()] = i->second;
             }
+            (*pos_assing) = new_assing;
             this->maped = 0;
         }
 
@@ -754,6 +762,14 @@ vector<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = 
 
 }
 
+template<typename T>
+void print_queue(T q) { // NB: pass by value so the print uses a copy
+    while(!q.empty()) {
+        cout << q.top().second << ' ';
+        q.pop();
+    }
+    cout << '\n';
+}
 
 void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unordered_set<int>() , unordered_set<int> U_2 =  unordered_set<int>()){
 
@@ -784,10 +800,10 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
     Dict pi_minus;
     Dict pi_bc;
 
-    unsigned int n_cross_aux=-1;
-    unsigned int n_cross_bc=-1;
-    unsigned int n_cross_plus=-1;
-    unsigned int n_cross_minus=-1;
+    unsigned int n_cross_aux;
+    unsigned int n_cross_bc;
+    unsigned int n_cross_plus;
+    unsigned int n_cross_minus;
 
 
     float bc;
@@ -796,9 +812,7 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
     int v_minus;
 
      // MIN HEAP
-    auto cmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
-    priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(cmp)> min_q(cmp);
-
+    MinQueue *min_q;
 
     sample = random_choice(G, deg, seed);
     print("")
@@ -806,9 +820,20 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
     for (auto i = sample.begin(); i != sample.end(); i++){
         print(*i);
 
+        n_cross_aux=-1;
+        n_cross_bc=-1;
+        n_cross_plus=-1;
+        n_cross_minus=-1;
+
+        v_bc = 0;
+        v_plus = 0;
+        v_minus = 0;
+
         v = *i;
         k = G.layer[v];
         bc = G.bc(v, k);
+
+        min_q = new MinQueue(mcmp);
 
         switch(k){
             case 1:
@@ -825,25 +850,89 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                     v_bc = bc;
                     v_minus = v_bc - 1 > 0 ;
                     v_plus =  v_bc + 1 > G.n_v2 ? 0 : v_bc + 1 ;
-                }
+                } // Think Better this else
 
                 //int_bc = int_bc > G.n_v2 - 1
                 pi_aux = G.pi_1;
                 n_cross_aux = G.n_cross();
-                min_q.push({pi_aux, n_cross_aux});
+                min_q->push({pi_aux, n_cross_aux});
 
+                if (v_bc){
+                    pi_bc = G.move_vertex(v, v_bc, 0);
+                    G.pi_1 = pi_bc;
+                    n_cross_bc = G.n_cross();
+                    min_q->push({pi_bc, n_cross_bc});
+                }
 
+                if (v_plus){
+                    pi_plus = G.move_vertex(v, v_plus, 0);
+                    G.pi_1 = pi_plus;
+                    n_cross_plus = G.n_cross();
+                    min_q->push({pi_plus, n_cross_plus});
+                }
+
+                if (v_minus){
+                    pi_minus = G.move_vertex(v, v_minus, 0);
+                    G.pi_1 = pi_minus;
+                    n_cross_minus = G.n_cross();
+                    min_q->push({pi_minus, n_cross_minus});
+                }
+
+                print_queue(*min_q);
+
+                G.pi_1 = min_q->top().first;
+                G.re_map(1);
 
             break;
 
             case 2:
+
+                if (  isInteger(bc)   ){
+                    v_bc = bc;
+                    v_minus = v_bc - 1;
+                    v_plus =  v_bc + 1 > G.n_v1 ? 0 : v_bc + 1 ;
+                } else if ( ((int) bc == 1) ){
+                    v_bc = bc + 1;
+                    v_minus = v_bc - 1;
+                    v_plus =  v_bc + 1 > G.n_v1 ? 0 : v_bc + 1 ;
+                } else if ( (int) bc == G.n_v1 ) {
+                    v_bc = bc;
+                    v_minus = v_bc - 1 > 0 ;
+                    v_plus =  v_bc + 1 > G.n_v1 ? 0 : v_bc + 1 ;
+                } // Think Better this else
+
                 pi_aux = G.pi_2;
+                n_cross_aux = G.n_cross();
+                min_q->push({pi_aux, n_cross_aux});
+
+                if (v_bc){
+                    pi_bc = G.move_vertex(v, v_bc, 0);
+                    G.pi_2 = pi_bc;
+                    n_cross_bc = G.n_cross();
+                    min_q->push({pi_bc, n_cross_bc});
+                }
+
+                if (v_plus){
+                    pi_plus = G.move_vertex(v, v_plus, 0);
+                    G.pi_2 = pi_plus;
+                    n_cross_plus = G.n_cross();
+                    min_q->push({pi_plus, n_cross_plus});
+                }
+
+                if (v_minus){
+                    pi_minus = G.move_vertex(v, v_minus, 0);
+                    G.pi_2 = pi_minus;
+                    n_cross_minus = G.n_cross();
+                    min_q->push({pi_minus, n_cross_minus});
+                }
+
+                print_queue(*min_q);
+
+                G.pi_2 = min_q->top().first;
+                G.re_map(2);
             break;
         }
-
-
-        //G.move_vertex()
-
+        if ( !min_q->top().second ) { return ;}
     }
 }
 
@@ -921,93 +1010,30 @@ int main(){
     print("################");
     print("MOVE");
 
-    auto mcmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
-    priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(mcmp)> min_q(mcmp);
+    //auto mcmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
+    //priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(mcmp)> min_q(mcmp);
+
+    MinQueue *test_pointer_queue;
+    MinQueue min_q(mcmp);
+
+    test_pointer_queue = &min_q;
 
     New.printBGraph();
     print("Crossing " << New.n_cross());
 
-    min_q.push({New.pi_1, New.n_cross()});
 
-    Dict r_test = New.move_vertex(2,1,0);
-    New.pi_1 = r_test;
+    print_queue(*test_pointer_queue);
+    print(test_pointer_queue->empty());
+
+    test_pointer_queue = new MinQueue(mcmp);
+    print_queue(*test_pointer_queue);
+
+    print(test_pointer_queue->empty());
+    print("################");
+    print("#####Construct######");
+    //construction_phase(New, U_1, U_2, 1);
     New.printBGraph();
-    print("Crossing " << New.n_cross());
-
-    min_q.push({r_test, New.n_cross()});
-
-    auto q_test1 = min_q.top();
-    min_q.pop();
-    auto q_test = min_q.top();
-
-    print("mIn q test");
-    print(q_test.second);
-
-    print("mIn q test 2");
-    print(q_test1.second);
-
-    print("Crossing " << New.n_cross());
-
-    New.pi_1 = q_test.first;
-    print("Crossing " << New.n_cross());
-
-    print(q_test.first[1].get_pos());
-    print(q_test.first[2].get_pos());
-    print(q_test.first[3].get_pos());
-    print(q_test.first[4].get_pos());
-    print(q_test.first[5].get_pos());
-    print("xx");
-
-    print(q_test1.first[1].get_pos());
-    print(q_test1.first[2].get_pos());
-    print(q_test1.first[3].get_pos());
-    print(q_test1.first[4].get_pos());
-    print(q_test1.first[5].get_pos());
-
-
-
-
-    print(New.pi_1[1].get_pos());
-    print(New.pi_1[2].get_pos());
-    print(New.pi_1[3].get_pos());
-    print(New.pi_1[4].get_pos());
-    print(New.pi_1[5].get_pos());
-    print("Crossing " << New.n_cross());
-    New.printBGraph();
-    print("Crossing " << New.n_cross());
-    New.re_map(1);
-    print("Crossing " << New.n_cross());
-    New.printBGraph();
-    print("Crossing " << New.n_cross());
-
-
-    //New.printBGraph();
-    print("Crossing " << New.n_cross());
-
-    //New.move_vertex(3,4,1);
-    New.printBGraph();
-    print("Crossing " << New.n_cross());
-
-    New.move_vertex(6,4);
-    New.printBGraph();
-    print("Crossing " << New.n_cross());
-
-    New.move_vertex(3,5);
-    New.printBGraph();
-
-    New.move_vertex(3,1);
-    New.printBGraph();
-
-    New.move_vertex(3,2);
-    New.printBGraph();
-
-    New.move_vertex(3,3);
-    New.printBGraph();
-    print("Crossing " << New.n_cross());
-
-
-    construction_phase(New, U_1, U_2, 1);
-    New.printBGraph();
+    print("Crossing:" << New.n_cross());
 /*
     print("")
     print("greedy");
@@ -1020,18 +1046,23 @@ int main(){
 
 
     time_t t_start, t_end;
-
-
     aux = New.degrees();
-
-    time(&t_start);
     random_choice(New, aux, 42);
 
+    time(&t_start);
+    construction_phase(New, U_1, U_2, 1);
     improvement_phase(New,42);
-
-
-
     time(&t_end);
+
+
+
+
+
+
+    New.printBGraph();
+    print("Crossing:" << New.n_cross());
+
+
 
     print("time")
     double time_taken = double(t_end - t_start);
