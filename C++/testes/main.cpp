@@ -84,25 +84,6 @@ class Solution {
    }
 };
 
-/*
-
-class Pi{ // Hash Table
-
-    private:
-        int max_items;
-
-
-        int getHash(Vertex v){
-            return v.get_pos() % max_items;
-        }
-
-
-    public(int max_item=1000);
-
-
-
-};
- */
 typedef unordered_map<int, unordered_map<int,int>> AdjMatrix;
 
 typedef unordered_set<int> Adj;
@@ -121,6 +102,12 @@ typedef struct Edge{
 auto mcmp = [](pair<Dict,int> left, pair<Dict,int> right) { return left.second > right.second; }; // Funcao de Comparacao
 typedef priority_queue<pair<Dict,int>, vector<pair<Dict,int>>, decltype(mcmp)> MinQueue;
 
+void print_map(const VSorted mapping) { // NB: pass by value so the print uses a copy
+    for(auto i = mapping.begin(); i != mapping.end(); i++){
+        cout << i->first << " - " << i->second.get_vertex() << " : "<< i->second.get_pos() << '\n'  ;
+
+    }
+}
 
 class BGraph{
     private:
@@ -201,8 +188,10 @@ class BGraph{
                 this->pi_1[v1_[i-1].get_vertex()] = v1_[i-1];
                 this->layer[v1_[i-1].get_vertex()] = 1;
             }
+            print("")
             for (i=1;i<=n_v2_;i++){
                 this->map_v2[v2_[i-1].get_pos()] = v2_[i-1];
+                cout << i << "(" << v2_[i-1].get_vertex() << ")" << " ~ ";
                 this->pi_2[v2_[i-1].get_vertex()] = v2_[i-1];
                 this->layer[v2_[i-1].get_vertex()] = 2;
             }
@@ -258,7 +247,7 @@ class BGraph{
 
             while( max_q.top().second >= deg_max && !max_q.empty()){
                 rcl.push_back(max_q.top().first);
-                    cout << "   TOP "<<max_q.top().first << " ";
+                    //cout << "   TOP "<<max_q.top().first << " ";
                 max_idx++;
                 max_q.pop();
             }
@@ -291,11 +280,11 @@ class BGraph{
 
             for( auto u = this->adj_list2[v].begin(); u != this->adj_list2[v].end(); u++){
                 //print(" barycenter");
-                cout << " barycenter" << *u << " : " << (*pi_k)[*u].get_pos() << endl;
+                //cout << " barycenter" << *u << " : " << (*pi_k)[*u].get_pos() << endl;
                 if((*pi_k)[*u].get_pos()){
                     b+=(*pi_k)[*u].get_pos();
                     K++;
-                    print(this->pi_2[6].get_pos());
+                    //print(this->pi_2[6].get_pos());
                 }
             }
             b/= K > 0 ? K : 1;
@@ -469,12 +458,21 @@ class BGraph{
         void printBGraph(){
             if (this->maped) { re_map(this->maped); }
 
-            char u;
-            char v;
+            string u;
+            string v;
+
+            int ut;
+            int vt;
             int n_max = (this->n_v1 > this->n_v2 ? this->n_v1 : this->n_v2);
             for (int i=1;i <= n_max ; i++){
-                u = this->map_v1[i].get_vertex() !=-1  ? (char) this->map_v1[i].get_vertex() + '0' : (char) 0 ;
-                v = this->map_v2[i].get_vertex() !=-1  ? (char) this->map_v2[i].get_vertex() + '0' : (char) 0 ;
+                //u = this->map_v1[i].get_vertex() !=-1  ? (char) this->map_v1[i].get_vertex() + '0' : (char) 0 ;
+                //v = this->map_v2[i].get_vertex() !=-1  ? (char) this->map_v2[i].get_vertex() + '0' : (char) 0 ;
+
+                ut = this->map_v1[i].get_vertex();
+                vt = this->map_v2[i].get_vertex();
+
+                u = this->map_v1[i].get_vertex() !=-1  ? to_string(this->map_v1[i].get_vertex()) : "" ;
+                v = this->map_v2[i].get_vertex() !=-1  ? to_string(this->map_v2[i].get_vertex()) : "" ;
                 cout <<  u << " "
                      <<  v << endl;
             }
@@ -528,13 +526,6 @@ class BGraph{
 
 };
 
-//#define pi(v) v.get_pos()
-//typedef hash_map<int,int> Pi;V.insert(*i);
-
-
-//template<typename T>
-
-
 void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_2, float alpha, int seed=-1){
 
     int v, k;
@@ -557,7 +548,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
 
     for (auto i = U_2.begin(); i != U_2.end(); i++){
 
-        cout << *i<<"("<<(G.pi_2[*i].get_pos()) << ") : " << endl ;
+        //cout << *i<<"("<<(G.pi_2[*i].get_pos()) << ") : " << endl ;
         U.insert(*i);
 
         pos = G.pi_2[*i].get_pos();
@@ -569,7 +560,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
 
     for (auto i = U_1.begin(); i != U_1.end(); i++){
 
-        cout << *i<<"("<<(G.pi_1[*i].get_pos()) << ") : " << endl ; //print exclude
+        //cout << *i<<"("<<(G.pi_1[*i].get_pos()) << ") : " << endl ; //print exclude
 
         U.insert(*i);
 
@@ -579,12 +570,13 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
         G.map_v1[pos] = *(new Vertex());
     }
 
+    /*
     for (auto i = U.begin(); i != U.end(); i++){
         cout << *i << " : ";
         G.pi_1.find(*i) == G.pi_1.end() ? cout << (G.pi_2[*i].get_pos()) << " /" : cout << (G.pi_1[*i].get_pos()) << " /";
         cout << endl;
     }
-
+*/
     v = G.greedy_selection(alpha, U, U);
     k = G.layer[v];
 
@@ -601,19 +593,19 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
             G.map_v2[1] = G.pi_2[v];
         break;
     }
-    print("check pos");
-    cout << G.map_v1[3].get_pos() << endl;
-    cout << G.n_cross() << endl;
+    //print("check pos");
+    //cout << G.map_v1[3].get_pos() << endl;
+    //cout << G.n_cross() << endl;
 
-    cout << G.pi_2[v].get_pos() << endl;
+    //cout << G.pi_2[v].get_pos() << endl;
 
     U.erase(v);
     V.insert(v);
     while (U.size()){
 
 
-        cout<<"SIZE V:" << V.size() << endl;
-        cout<<"SIZE U:" << U.size() << endl;
+       // cout<<"SIZE V:" << V.size() << endl;
+        //cout<<"SIZE U:" << U.size() << endl;
         v = G.greedy_selection(alpha, U, V);
         k = G.layer[v];
 
@@ -628,7 +620,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
                 pi = &G.pi_2;
             break;
         }
-        cout << "Layer " << k << " Size " << pos_assing->size() << endl;
+        //cout << "Layer " << k << " Size " << pos_assing->size() << endl;
 
         bc_v = G.bc(v, k);
         bc_v = bc_v > 0 ? bc_v : 1; // Pos check for start at 1st
@@ -645,7 +637,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
         }
 
         while((n_cross_plus==-1) && (n_cross_minus==-1)){
-
+/*
             print("pos_assing _minus");
             cout << bc_v_minus << " : " << ((*pos_assing)[bc_v_minus].get_pos())
                                         << "("<< ((*pos_assing)[bc_v_minus].get_vertex()) << ")"
@@ -654,7 +646,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
             print("pos_assing _plus");
             cout << bc_v_plus << " : "  << ((*pos_assing)[bc_v_plus].get_pos())
                                         << "(" <<((*pos_assing)[bc_v_plus].get_vertex()) << ")"
-                                        << endl;
+                                        << endl;*/
 
             if (!((*pos_assing)[bc_v_minus].get_pos()) && bc_v_minus ){
                 (*pi)[v].setPos(bc_v_minus);
@@ -709,7 +701,7 @@ vector<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = 
 
     for(auto i = Degrees.begin(); i != Degrees.end() ; i++ ){
 
-        cout << i->first << "(" << i->second << ") * ";
+        //cout << i->first << "(" << i->second << ") * ";
 
         vector_list.push_back(i->first);
         pr_list.push_back(i->second);
@@ -753,8 +745,8 @@ vector<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = 
         }
         i++;
     }
-    cout << endl;
-    cout << i ;
+    //cout << endl;
+    //cout << i ;
 
     return sample;
     //while(Degrees.size()){
@@ -815,10 +807,9 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
     MinQueue *min_q;
 
     sample = random_choice(G, deg, seed);
-    print("")
-    print("############SAMPLE CHECK################");
+    //print("")
+    //print("############SAMPLE CHECK################");
     for (auto i = sample.begin(); i != sample.end(); i++){
-        print(*i);
 
         n_cross_aux=-1;
         n_cross_bc=-1;
@@ -834,7 +825,6 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
         bc = G.bc(v, k);
 
         min_q = new MinQueue(mcmp);
-
         switch(k){
             case 1:
 
@@ -858,6 +848,7 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                 min_q->push({pi_aux, n_cross_aux});
 
                 if (v_bc){
+                    G.pi_1 = pi_aux;
                     pi_bc = G.move_vertex(v, v_bc, 0);
                     G.pi_1 = pi_bc;
                     n_cross_bc = G.n_cross();
@@ -865,6 +856,7 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                 }
 
                 if (v_plus){
+                    G.pi_1 = pi_aux;
                     pi_plus = G.move_vertex(v, v_plus, 0);
                     G.pi_1 = pi_plus;
                     n_cross_plus = G.n_cross();
@@ -872,13 +864,14 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                 }
 
                 if (v_minus){
+                    G.pi_1 = pi_aux;
                     pi_minus = G.move_vertex(v, v_minus, 0);
                     G.pi_1 = pi_minus;
                     n_cross_minus = G.n_cross();
                     min_q->push({pi_minus, n_cross_minus});
                 }
 
-                print_queue(*min_q);
+                //print_queue(*min_q);
 
                 G.pi_1 = min_q->top().first;
                 G.re_map(1);
@@ -906,6 +899,7 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                 min_q->push({pi_aux, n_cross_aux});
 
                 if (v_bc){
+                    G.pi_2 = pi_aux;
                     pi_bc = G.move_vertex(v, v_bc, 0);
                     G.pi_2 = pi_bc;
                     n_cross_bc = G.n_cross();
@@ -913,6 +907,7 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                 }
 
                 if (v_plus){
+                    G.pi_2 = pi_aux;
                     pi_plus = G.move_vertex(v, v_plus, 0);
                     G.pi_2 = pi_plus;
                     n_cross_plus = G.n_cross();
@@ -920,16 +915,19 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
                 }
 
                 if (v_minus){
+                    G.pi_2 = pi_aux;
                     pi_minus = G.move_vertex(v, v_minus, 0);
                     G.pi_2 = pi_minus;
                     n_cross_minus = G.n_cross();
                     min_q->push({pi_minus, n_cross_minus});
                 }
 
-                print_queue(*min_q);
+                //print_queue(*min_q);
 
                 G.pi_2 = min_q->top().first;
                 G.re_map(2);
+
+
             break;
         }
         if ( !min_q->top().second ) { return ;}
@@ -938,7 +936,8 @@ void improvement_phase(BGraph& G, int seed =-1, unordered_set<int> U_1 = unorder
 
 int main(){
 
-    Edge e[] = {{1,6}, {2,6}, {3,7}, {3,8}, {4,7}, {5,6}, {5,9}, {2,9},{4,6}};
+//    Edge e[] = {{1,6}, {2,6}, {3,7}, {3,8}, {4,7}, {5,6}, {5,9}, {2,9},{4,6}};
+    Edge e[] = {{0, 49}, {0, 41}, {0, 42}, {1, 57}, {1, 44}, {1, 60}, {2, 53}, {2, 42}, {2, 60}, {3, 36}, {3, 42}, {3, 59}, {3, 44}, {4, 35}, {4, 47}, {5, 35}, {5, 46}, {6, 51}, {6, 40}, {7, 37}, {8, 34}, {9, 54}, {9, 43}, {9, 31}, {10, 50}, {11, 54}, {11, 55}, {11, 56}, {12, 48}, {12, 39}, {13, 57}, {13, 44}, {14, 43}, {15, 40}, {16, 48}, {17, 37}, {17, 58}, {17, 43}, {18, 52}, {18, 58}, {19, 59}, {19, 45}, {20, 32}, {21, 38}, {22, 41}, {22, 60}, {23, 33}, {23, 55}, {23, 57}, {23, 42}, {24, 55}, {24, 42}, {25, 35}, {25, 58}, {26, 35}, {26, 59}, {27, 51}, {27, 55}, {28, 40}, {29, 57}, {29, 61}, {30, 54}, {30, 47}};
 
 
    /*
@@ -960,9 +959,10 @@ int main(){
 
     Vertex *v1;//v1[5];
     Vertex *v2;//v2[4];
-    v1 = new Vertex[5];
-    v2 = new Vertex[4];
+    v1 = new Vertex[31];
+    v2 = new Vertex[31];
 
+    /*
     v1[0].setVertex(1, 1);
     v1[1].setVertex(2, 3);
     v1[2].setVertex(3, 2);
@@ -975,15 +975,54 @@ int main(){
     v2[2].setVertex(8, 3);
     v2[3].setVertex(9, 4);
 
+
     BGraph New(5, 4, 7,
               v1, v2, e,
               1);
+    */
+    v1[0].setVertex(0,1);	v2[0].setVertex(31,1);
+    v1[1].setVertex(1,2);	v2[1].setVertex(32,2);
+    v1[2].setVertex(2,3);	v2[2].setVertex(33,3);
+    v1[3].setVertex(3,4);	v2[3].setVertex(34,4);
+    v1[4].setVertex(4,5);	v2[4].setVertex(35,5);
+    v1[5].setVertex(5,6);	v2[5].setVertex(36,6);
+    v1[6].setVertex(6,7);	v2[6].setVertex(37,7);
+    v1[7].setVertex(7,8);	v2[7].setVertex(38,8);
+    v1[8].setVertex(8,9);	v2[8].setVertex(39,9);
+    v1[9].setVertex(9,10);	v2[9].setVertex(40,10);
+    v1[10].setVertex(10,11);	v2[10].setVertex(41,11);
+    v1[11].setVertex(11,12);	v2[11].setVertex(42,12);
+    v1[12].setVertex(12,13);	v2[12].setVertex(43,13);
+    v1[13].setVertex(13,14);	v2[13].setVertex(44,14);
+    v1[14].setVertex(14,15);	v2[14].setVertex(45,15);
+    v1[15].setVertex(15,16);	v2[15].setVertex(46,16);
+    v1[16].setVertex(16,17);	v2[16].setVertex(47,17);
+    v1[17].setVertex(17,18);	v2[17].setVertex(48,18);
+    v1[18].setVertex(18,19);	v2[18].setVertex(49,19);
+    v1[19].setVertex(19,20);	v2[19].setVertex(50,20);
+    v1[20].setVertex(20,21);	v2[20].setVertex(51,21);
+    v1[21].setVertex(21,22);	v2[21].setVertex(52,22);
+    v1[22].setVertex(22,23);	v2[22].setVertex(53,23);
+    v1[23].setVertex(23,24);	v2[23].setVertex(54,24);
+    v1[24].setVertex(24,25);	v2[24].setVertex(55,25);
+    v1[25].setVertex(25,26);	v2[25].setVertex(56,26);
+    v1[26].setVertex(26,27);	v2[26].setVertex(57,27);
+    v1[27].setVertex(27,28);	v2[27].setVertex(58,28);
+    v1[28].setVertex(28,29);	v2[28].setVertex(59,29);
+    v1[29].setVertex(29,30);	v2[29].setVertex(60,30);
+    v1[30].setVertex(30,31);	v2[30].setVertex(61,31);
+
+
+    BGraph New(31, 31, 63,
+              v1, v2, e,
+              0);
 
     cout << "Crossing : " << New.n_cross();
     print("matrix")
     New.printMatrix_2();
 
-
+    print("TESTE <SADASDADADASDASD")
+    print_map(New.map_v1);
     //print("test_deg");
 
     //New.printGraph();
@@ -995,9 +1034,15 @@ int main(){
     print("deg_test");
     unordered_map<int,int> aux;
 
-
+/*
     unordered_set<int> U_1({1,2,3,4,5});
     unordered_set<int> U_2({6,7,8,9});
+
+    unordered_set<int> V({3,4,7,8});
+    unordered_set<int> V_sub({1,2,5,6,9});
+*/
+    unordered_set<int> U_1({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30});
+    unordered_set<int> U_2({31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61});
 
     unordered_set<int> V({3,4,7,8});
     unordered_set<int> V_sub({1,2,5,6,9});
@@ -1005,7 +1050,7 @@ int main(){
     print("union")
     srand(1);
 
-    print(New.greedy_selection(1, V, V_sub));
+    //print(New.greedy_selection(1, V, V_sub));
 
     print("################");
     print("MOVE");
@@ -1045,14 +1090,18 @@ int main(){
 
 
 
-    time_t t_start, t_end;
+    clock_t t_start, t_end;
     aux = New.degrees();
+
+
     random_choice(New, aux, 42);
 
-    time(&t_start);
+    t_start = clock();
     construction_phase(New, U_1, U_2, 1);
+    //New.printBGraph();
     improvement_phase(New,42);
-    time(&t_end);
+    t_end = clock();
+
 
 
 
@@ -1065,9 +1114,9 @@ int main(){
 
 
     print("time")
-    double time_taken = double(t_end - t_start);
+    double time_taken = double(t_end - t_start) / double(CLOCKS_PER_SEC);;
     cout << "Time taken by program is : " << fixed
-         << time_taken << setprecision(10);
+         << time_taken << setprecision(16);
     cout << " sec " << endl;
 
     auto cmp = [](pair<int,int> left, pair<int,int> right) { return left.second < right.second; };
