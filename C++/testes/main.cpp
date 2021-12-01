@@ -606,7 +606,7 @@ void construction_phase(BGraph& G, unordered_set<int> U_1, unordered_set<int> U_
 
        // cout<<"SIZE V:" << V.size() << endl;
         //cout<<"SIZE U:" << U.size() << endl;
-        v = G.greedy_selection(alpha, U, V);
+        v = G.greedy_selection(alpha, U, V, seed);
         k = G.layer[v];
 
         switch(k){
@@ -739,8 +739,8 @@ vector<int> random_choice(BGraph& G, unordered_map<int,int> Degrees, int seed = 
         auto p = restrict_set.insert(v);
 
         if( p.second ){
-            cout //<< "(" << s << ")"
-            << v << " / ";
+            //cout //<< "(" << s << ")"
+            //<< v << " / ";
             sample.push_back(v);
         }
         i++;
@@ -1097,11 +1097,29 @@ int main(){
     random_choice(New, aux, 42);
 
     t_start = clock();
-    construction_phase(New, U_1, U_2, 1);
-    //New.printBGraph();
-    improvement_phase(New,42);
-    t_end = clock();
+    construction_phase(New, U_1, U_2, 0.8, 42);
+    New.printBGraph();
+    improvement_phase(New, 42);
 
+
+    construction_phase(New, U_1, U_2, 0.8, 50);
+    //New.printBGraph();
+    improvement_phase(New, 50);
+
+    construction_phase(New, U_1, U_2, 0.8, 47);
+    //New.printBGraph();
+    improvement_phase(New, 47);
+
+    construction_phase(New, U_1, U_2, 0.8, 88);
+    //New.printBGraph();
+    improvement_phase(New, 88);
+
+    construction_phase(New, U_1, U_2, 0.8, 99);
+    //New.printBGraph();
+    improvement_phase(New, 99);
+
+
+    t_end = clock();
 
 
 
