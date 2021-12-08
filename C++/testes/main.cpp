@@ -1226,7 +1226,7 @@ int main(){
     for(int i=0; i<30; i++){
         construction_phase(New, U_1, U_2, 0.8, i);
         improvement_phase(New, i);
-        print("Crossing:" << New.n_cross());
+        //print("Crossing:" << New.n_cross());
     }
 
     t_end = clock();

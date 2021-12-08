@@ -17,3 +17,21 @@
 
 1631643251 c:\users\bruno ferrari\documents\bruno\2019\2s\mc\artigos revisão\artigos mes\gd\bdp\c++\bgraph\bgraph.h
 
+1633144468 source:d:\github\bdp\c++\bgraph\grasp.cpp
+
+1638939607 source:d:\github\bdp\c++\bgraph\main.cpp
+	<iostream>
+	<limits>
+	"bgraph.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1638938081 d:\github\bdp\c++\bgraph\bgraph.h
+	<bits/stdc++.h>
+	<unordered_map>
+	<unordered_set>
+
+1638939433 source:d:\github\bdp\c++\bgraph\bgraph.cpp
+	"bgraph.h"
+
