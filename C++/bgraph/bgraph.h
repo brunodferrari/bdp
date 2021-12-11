@@ -3,7 +3,12 @@
     Author: Bruno Ferrari
 */
 
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
+#include <map>
+#include <queue>
+#include <vector>
+#include <iostream>
+
 #include <unordered_map>
 #include <unordered_set>
 #define print(txt) cout << txt << endl;

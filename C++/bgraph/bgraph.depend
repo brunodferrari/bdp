@@ -19,7 +19,7 @@
 
 1633144468 source:d:\github\bdp\c++\bgraph\grasp.cpp
 
-1638939607 source:d:\github\bdp\c++\bgraph\main.cpp
+1638939737 source:d:\github\bdp\c++\bgraph\main.cpp
 	<iostream>
 	<limits>
 	"bgraph.h"
@@ -27,11 +27,14 @@
 	<stdlib.h>
 	<time.h>
 
-1638938081 d:\github\bdp\c++\bgraph\bgraph.h
-	<bits/stdc++.h>
+1639217396 d:\github\bdp\c++\bgraph\bgraph.h
+	<map>
+	<queue>
+	<vector>
+	<iostream>
 	<unordered_map>
 	<unordered_set>
 
-1638939433 source:d:\github\bdp\c++\bgraph\bgraph.cpp
+1639217289 source:d:\github\bdp\c++\bgraph\bgraph.cpp
 	"bgraph.h"
 
